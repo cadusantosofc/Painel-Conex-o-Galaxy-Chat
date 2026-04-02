@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Reconectar WhatsApp</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #080c14;
+  --surface: #0d1321;
+  --surface2: #111827;
+  --border: rgba(255,255,255,0.07);
+  --border-active: rgba(99,179,237,0.35);
+  --text: #e8edf5;
+  --muted: #64748b;
+  --accent: #3b82f6;
+  --accent-glow: rgba(59,130,246,0.25);
+  --success: #22c55e;
+  --success-bg: rgba(34,197,94,0.08);
+  --error: #f87171;
+  --error-bg: rgba(248,113,113,0.08);
+  --radius: 12px;
+}
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(59,130,246,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 32px 28px;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(59,130,246,0.4), transparent);
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.icon-wrap {
+  width: 52px;
+  height: 52px;
+  background: linear-gradient(135deg, #1a3a1a, #0f2a0f);
+  border: 1px solid rgba(37,211,102,0.2);
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+}
+
+.icon-wrap svg { width: 26px; height: 26px; }
+
+.header h1 {
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.3px;
+  color: var(--text);
+  margin-bottom: 6px;
+}
+
+.header p {
+  font-size: 13.5px;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.field {
+  position: relative;
+  margin-bottom: 12px;
+}
+
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.field input {
+  width: 100%;
+  padding: 13px 16px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+  letter-spacing: 0.5px;
+}
+
+.field input::placeholder { color: var(--muted); font-weight: 400; }
+
+.field input:focus {
+  border-color: var(--border-active);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.field small {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+}
+
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: var(--accent);
+  border: none;
+  border-radius: var(--radius);
+  color: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: #2563eb;
+  box-shadow: 0 4px 20px rgba(59,130,246,0.3);
+}
+
+.btn-primary:active:not(:disabled) { transform: scale(0.98); }
+
+.btn-primary:disabled {
+  background: var(--surface2);
+  color: var(--muted);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-retry {
+  width: 100%;
+  padding: 11px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 16px;
+  display: none;
+}
+
+.btn-retry:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
+.btn-retry:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-glow);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59,130,246,0.15);
+}
+
+.btn-retry:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  border-color: var(--border);
+  color: var(--muted);
+  background: transparent;
+}
+
+.status-box {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  font-weight: 500;
+  margin-top: 16px;
+  animation: fadeSlide 0.25s ease;
+}
+
+.status-box.success {
+  background: var(--success-bg);
+  border: 1px solid rgba(34,197,94,0.2);
+  color: var(--success);
+}
+
+.status-box.error {
+  background: var(--error-bg);
+  border: 1px solid rgba(248,113,113,0.2);
+  color: var(--error);
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.status-box.success .status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); }
+.status-box.error .status-dot { background: var(--error); box-shadow: 0 0 6px var(--error); }
+
+.loader {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 14px 0;
+  color: var(--muted);
+  font-size: 13px;
+  animation: fadeSlide 0.2s ease;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+.qr-wrap {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 20px;
+  animation: fadeSlide 0.3s ease;
+}
+
+.qr-frame {
+  padding: 12px;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px var(--border), 0 8px 32px rgba(0,0,0,0.4);
+}
+
+.qr-frame img {
+  display: block;
+  width: 200px;
+  height: 200px;
+}
+
+.qr-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  line-height: 1.5;
+}
+
+.pairing-code {
+  display: none;
+  margin-top: 14px;
+  padding: 10px 20px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: 4px;
+  color: var(--text);
+  text-align: center;
+}
+
+.countdown-bar {
+  display: none;
+  margin-top: 16px;
+  height: 3px;
+  background: var(--border);
+  border-radius: 99px;
+  overflow: hidden;
+}
+
+.countdown-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 99px;
+  transition: width 1s linear;
+}
+
+.divider {
+  height: 1px;
+  background: var(--border);
+  margin: 20px 0;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes fadeSlide {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+  <div class="header">
+    <div class="icon-wrap">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" fill="#25D366"/>
+        <path d="M12 2C6.477 2 2 6.477 2 12c0 1.821.487 3.53 1.338 5L2 22l5.167-1.32A9.953 9.953 0 0012 22c5.523 0 10-4.477 10-10S17.523 2 12 2z" stroke="#25D366" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      </svg>
+    </div>
+    <h1>Reconectar WhatsApp</h1>
+    <p>Informe seu número para gerar o QR Code</p>
+  </div>
+
+  <div class="field">
+    <label>Número</label>
+    <input id="numero" type="tel" placeholder="5518998999999" />
+    <small style="display: none; color: var(--error); font-size: 11px; margin-top: 4px;" id="numeroError"></small>
+  </div>
+
+  <button id="btnVerificar" class="btn-primary" onclick="iniciar()">Verificar conexão</button>
+
+  <div id="loader" class="loader">
+    <div class="spinner"></div>
+    <span id="loaderText">Verificando...</span>
+  </div>
+
+  <div id="statusBox" class="status-box">
+    <div class="status-dot"></div>
+    <span id="statusText"></span>
+  </div>
+
+  <div id="qrWrap" class="qr-wrap">
+    <div class="qr-frame">
+      <img id="qrImg" />
+    </div>
+    <p class="qr-hint">Abra o WhatsApp → Menu → Dispositivos conectados<br>e escaneie o código acima</p>
+    <button id="btnRetry" class="btn-retry" onclick="retry()">Nova tentativa</button>
+  </div>
+
+  <div id="pairingCode" class="pairing-code"></div>
+
+  <div id="countdownBar" class="countdown-bar">
+    <div id="countdownFill" class="countdown-fill" style="width:100%"></div>
+  </div>
+</div>
+
+<script>
+const API_URL = "https://apiflow.galaxychat.com.br/webhook/2e9efb4b-e025-494f-acce-b3985b8e00de";
+const RETRY_SECONDS = 30;
+
+let countdownTimer = null;
+let currentNumero = "";
+
+const el = id => document.getElementById(id);
+
+function validarNumero(numero) {
+  // Remove espaços e caracteres especiais, mantém apenas números
+  const apenasNumeros = numero.replace(/\D/g, '');
+  
+  // Validações
+  if (!apenasNumeros) {
+    return { valido: false, erro: "Informe um número" };
+  }
+  
+  if (apenasNumeros.length < 11) {
+    return { valido: false, erro: "Mínimo 11 dígitos (DDI + DDD + 8 dígitos)" };
+  }
+  
+  if (apenasNumeros.length > 15) {
+    return { valido: false, erro: "Máximo 15 dígitos" };
+  }
+  
+  // Verifica se o DDI é válido (começa com 1-9)
+  if (!/^[1-9]/.test(apenasNumeros)) {
+    return { valido: false, erro: "DDI inválido (deve começar com 1-9)" };
+  }
+  
+  return { valido: true, numero: apenasNumeros };
+}
+
+function setStatus(type, msg) {
+  const box = el("statusBox");
+  box.className = "status-box " + type;
+  box.style.display = "flex";
+  el("statusText").textContent = msg;
+}
+
+function clearStatus() {
+  el("statusBox").style.display = "none";
+}
+
+function setLoading(show, msg = "Verificando...") {
+  el("loader").style.display = show ? "flex" : "none";
+  el("loaderText").textContent = msg;
+}
+
+function showQR(src) {
+  const img = el("qrImg");
+  img.src = src;
+  img.onload = () => {
+    el("qrWrap").style.display = "flex";
+    setStatus("success", "QR Code gerado — escaneie para conectar");
+  };
+  img.onerror = () => {
+    setStatus("error", "QR Code inválido ou expirado");
+  };
+}
+
+function hideQR() {
+  el("qrWrap").style.display = "none";
+  el("qrImg").src = "";
+}
+
+function showPairing(code) {
+  const box = el("pairingCode");
+  box.textContent = code.slice(0,4) + " – " + code.slice(4);
+  box.style.display = "block";
+}
+
+function hidePairing() {
+  el("pairingCode").style.display = "none";
+}
+
+function startCountdown(onDone) {
+  clearCountdown();
+  const btn = el("btnRetry");
+
+  btn.style.display = "block";
+  btn.disabled = true;
+  btn.textContent = "Aguarde " + RETRY_SECONDS + "s...";
+
+  let s = RETRY_SECONDS;
+
+  countdownTimer = setInterval(() => {
+    s--;
+    btn.textContent = "Aguarde " + s + "s...";
+    if (s <= 0) {
+      clearCountdown();
+      btn.disabled = false;
+      btn.textContent = "Nova tentativa";
+      if (onDone) onDone();
+    }
+  }, 1000);
+}
+
+function clearCountdown() {
+  if (countdownTimer) {
+    clearInterval(countdownTimer);
+    countdownTimer = null;
+  }
+}
+
+function resetUI() {
+  clearStatus();
+  hideQR();
+  hidePairing();
+  clearCountdown();
+  el("btnRetry").style.display = "none";
+  el("btnRetry").disabled = false;
+  setLoading(false);
+}
+
+async function fetchQR(numero) {
+  const res = await fetch(API_URL, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ numero })
+  });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  const data = await res.json();
+  return Array.isArray(data) ? data[0] : data;
+}
+
+async function iniciar() {
+  const input = el("numero").value.trim();
+  const validacao = validarNumero(input);
+  const errorEl = document.getElementById("numeroError");
+  
+  if (!validacao.valido) {
+    errorEl.textContent = validacao.erro;
+    errorEl.style.display = "block";
+    setStatus("error", validacao.erro);
+    return;
+  }
+  
+  errorEl.style.display = "none";
+  const numero = validacao.numero;
+  currentNumero = numero;
+  resetUI();
+
+  el("btnVerificar").style.display = "none";
+  setLoading(true, "Verificando conexão...");
+
+  try {
+    const d = await fetchQR(numero);
+
+    setLoading(false);
+
+    if (d.connected) {
+      setStatus("success", "Número já está conectado");
+      return;
+    }
+
+    setStatus("error", "Desconectado — escaneie o QR Code");
+
+    if (d.qrcodeText?.includes("data:image/png;base64")) {
+      showQR(d.qrcodeText);
+    }
+
+    if (d.pairingCode && /^[A-Z0-9]{8}$/.test(d.pairingCode)) {
+      showPairing(d.pairingCode);
+    }
+
+    startCountdown();
+
+  } catch {
+    setLoading(false);
+    setStatus("error", "Erro ao conectar com o servidor");
+    el("btnVerificar").style.display = "block";
+  }
+}
+
+async function retry() {
+  if (!currentNumero) return;
+
+  el("btnRetry").style.display = "none";
+  clearCountdown();
+  hideQR();
+  hidePairing();
+  clearStatus();
+
+  setLoading(true, "Gerando novo QR Code...");
+
+  try {
+    const d = await fetchQR(currentNumero);
+
+    setLoading(false);
+
+    if (d.connected) {
+      setStatus("success", "Número já está conectado");
+      return;
+    }
+
+    setStatus("error", "Desconectado — escaneie o QR Code");
+
+    if (d.qrcodeText?.includes("data:image/png;base64")) {
+      showQR(d.qrcodeText);
+    }
+
+    if (d.pairingCode && /^[A-Z0-9]{8}$/.test(d.pairingCode)) {
+      showPairing(d.pairingCode);
+    }
+
+    startCountdown();
+
+  } catch {
+    setLoading(false);
+    setStatus("error", "Erro ao gerar novo QR Code");
+    el("btnRetry").style.display = "block";
+    el("btnRetry").disabled = false;
+    el("btnRetry").textContent = "Nova tentativa";
+  }
+}
+
+el("numero").addEventListener("keydown", e => {
+  if (e.key === "Enter" && el("btnVerificar").style.display !== "none") iniciar();
+});
+
+el("numero").addEventListener("input", () => {
+  const errorEl = document.getElementById("numeroError");
+  const input = el("numero").value.trim();
+  
+  if (!input) {
+    errorEl.style.display = "none";
+    return;
+  }
+  
+  const validacao = validarNumero(input);
+  if (!validacao.valido) {
+    errorEl.textContent = validacao.erro;
+    errorEl.style.display = "block";
+  } else {
+    errorEl.style.display = "none";
+  }
+});
+</script>
+</body>
+</html>
