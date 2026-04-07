@@ -376,8 +376,9 @@ body::before {
       <img id="qrImg" />
     </div>
     <p class="qr-hint">Abra o WhatsApp → Menu → Dispositivos conectados<br>e escaneie o código acima</p>
-    <button id="btnRetry" class="btn-retry" onclick="retry()">Nova tentativa</button>
   </div>
+
+  <button id="btnRetry" class="btn-retry" onclick="retry()">Nova tentativa</button>
 
   <div id="pairingCode" class="pairing-code"></div>
 
@@ -387,7 +388,7 @@ body::before {
 </div>
 
 <script>
-const API_URL = "https://apiflow.galaxychat.com.br/webhook/2e9efb4b-e025-494f-acce-b3985b8e00de";
+const API_URL = "https://apiworkflow.galaxychat.com.br/webhook/2e9efb4b-e025-494f-acce-b3985b8e00de";
 const RETRY_SECONDS = 30;
 
 let countdownTimer = null;
@@ -395,29 +396,48 @@ let currentNumero = "";
 
 const el = id => document.getElementById(id);
 
-function validarNumero(numero) {
-  // Remove espaços e caracteres especiais, mantém apenas números
-  const apenasNumeros = numero.replace(/\D/g, '');
+function validarNumero(input) {
+  if (!input) {
+    return { valido: false, erro: "Informe um número", numero: "" };
+  }
+
+  // Remover todos os caracteres não numéricos, incluindo +, (, ), -, espaços, etc.
+  let numero = input.replace(/\D/g, '');
   
-  // Validações
-  if (!apenasNumeros) {
-    return { valido: false, erro: "Informe um número" };
+  // Se não começar com 55, adicionar automaticamente
+  if (!numero.startsWith('55')) {
+    numero = '55' + numero;
   }
   
-  if (apenasNumeros.length < 11) {
-    return { valido: false, erro: "Mínimo 11 dígitos (DDI + DDD + 8 dígitos)" };
+  // Verificar se tem pelo menos 12 dígitos (55 + DDD + número)
+  if (numero.length < 12) {
+    return { 
+      valido: false, 
+      erro: "Número incompleto. Ex: 5511999999999 ou 11999999999", 
+      numero: "" 
+    };
   }
   
-  if (apenasNumeros.length > 15) {
-    return { valido: false, erro: "Máximo 15 dígitos" };
+  // Verificar se tem no máximo 13 dígitos (55 + DDD + 9 dígitos)
+  if (numero.length > 13) {
+    return { 
+      valido: false, 
+      erro: "Número muito longo. Máximo 13 dígitos", 
+      numero: "" 
+    };
   }
   
-  // Verifica se o DDI é válido (começa com 1-9)
-  if (!/^[1-9]/.test(apenasNumeros)) {
-    return { valido: false, erro: "DDI inválido (deve começar com 1-9)" };
+  // Verificar se o DDD é válido (11 a 99)
+  const ddd = numero.substring(2, 4);
+  if (ddd.length < 2 || parseInt(ddd) < 11 || parseInt(ddd) > 99) {
+    return { 
+      valido: false, 
+      erro: "DDD inválido. Use 2 dígitos após 55", 
+      numero: "" 
+    };
   }
   
-  return { valido: true, numero: apenasNumeros };
+  return { valido: true, erro: "", numero: numero };
 }
 
 function setStatus(type, msg) {
@@ -502,15 +522,79 @@ function resetUI() {
   setLoading(false);
 }
 
-async function fetchQR(numero) {
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ numero })
-  });
-  if (!res.ok) throw new Error("HTTP " + res.status);
-  const data = await res.json();
-  return Array.isArray(data) ? data[0] : data;
+async function fetchQR(numero, tentativa = 1) {
+  const maxTentativas = 3;
+  const timeout = 15000; // 15 segundos
+
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeout);
+
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: { 
+        "Content-Type": "application/json",
+        "X-Tentativa": tentativa.toString() // Header para log no n8n
+      },
+      body: JSON.stringify({ numero }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (!res.ok) {
+      if (res.status === 404) {
+        throw new Error("Número não encontrado em nossa base");
+      }
+      if (res.status === 500) {
+        throw new Error("Erro interno do servidor");
+      }
+      throw new Error(`HTTP ${res.status}`);
+    }
+
+    const data = await res.json();
+    console.log(`Tentativa ${tentativa}:`, data);
+    
+    // Tratar número inexistente
+    if (data.conexão === "inexistente" || data.conexao === "inexistente") {
+      throw new Error("Número não encontrado em nossa base");
+    }
+    
+    // Se QR Code está sendo gerado e ainda tentativas restantes
+    if (data.message?.includes("QR code está sendo gerado") && tentativa < maxTentativas) {
+      console.log(`QR Code sendo gerado, tentando novamente em 3s... (${tentativa}/${maxTentativas})`);
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      return await fetchQR(numero, tentativa + 1);
+    }
+
+    return Array.isArray(data) ? data[0] : data;
+
+  } catch (err) {
+    if (err.name === 'AbortError') {
+      throw new Error("Tempo esgotado. Tente novamente.");
+    }
+    throw err;
+  }
+}
+
+function showRetryButton() {
+  console.log("=== showRetryButton() chamado ===");
+  const btnRetry = el("btnRetry");
+  console.log("Botão encontrado:", !!btnRetry);
+  console.log("Display atual:", btnRetry.style.display);
+  
+  // Força a remoção de qualquer estilo que possa estar escondendo
+  btnRetry.style.removeProperty('display');
+  btnRetry.style.display = "block";
+  btnRetry.disabled = false;
+  btnRetry.textContent = "Tentar novo número";
+  btnRetry.onclick = () => {
+    console.log("Clicou em tentar novo número - fazendo reload");
+    window.location.reload();
+  };
+  
+  console.log("Display após mudança:", btnRetry.style.display);
+  console.log("=== showRetryButton() finalizado ===");
 }
 
 async function iniciar() {
@@ -535,11 +619,21 @@ async function iniciar() {
 
   try {
     const d = await fetchQR(numero);
+    console.log("Resposta da API:", d);
 
     setLoading(false);
 
+    // Se a API retornar erro ou não tiver dados
+    if (!d || d.error) {
+      setStatus("error", d?.error || "Número não encontrado. Verifique o número informado.");
+      showRetryButton();
+      return;
+    }
+
     if (d.connected) {
+      console.log("Número está conectado - mostrando botão retry");
       setStatus("success", "Número já está conectado");
+      showRetryButton();
       return;
     }
 
@@ -555,10 +649,21 @@ async function iniciar() {
 
     startCountdown();
 
-  } catch {
+  } catch (err) {
     setLoading(false);
-    setStatus("error", "Erro ao conectar com o servidor");
-    el("btnVerificar").style.display = "block";
+    console.error("Erro:", err);
+    
+    let mensagemErro = "Erro ao conectar com o servidor";
+    if (err.message.includes("não encontrado")) {
+      mensagemErro = "Número não encontrado. Verifique o número informado.";
+    } else if (err.message.includes("Tempo esgotado")) {
+      mensagemErro = "Tempo esgotado. Tente novamente.";
+    } else if (err.message.includes("Erro interno")) {
+      mensagemErro = "Servidor com problemas. Tente em alguns minutos.";
+    }
+    
+    setStatus("error", mensagemErro);
+    showRetryButton();
   }
 }
 
@@ -579,7 +684,9 @@ async function retry() {
     setLoading(false);
 
     if (d.connected) {
+      console.log("Número está conectado - mostrando botão retry");
       setStatus("success", "Número já está conectado");
+      showRetryButton();
       return;
     }
 
