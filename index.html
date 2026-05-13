@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conectar WhatsApp — Galaxy Chat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #5690F0;
+      --blue-deep: #3a72d4;
+      --blue-pale: #EEF4FF;
+      --blue-mid: #c7d9fc;
+      --green: #22C55E;
+      --red: #EF4444;
+      --text: #0D1526;
+      --muted: #7B8FAF;
+      --line: #E8EDF5;
+      --bg: #F0F4FB;
+      --card: #FFFFFF;
+      --r: 20px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      /* Mesh gradient atmosphere */
+      background-image:
+        radial-gradient(ellipse 80% 60% at 10% -10%, rgba(86,144,240,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 90% 110%, rgba(86,144,240,0.10) 0%, transparent 60%);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── Card (base — expanded via JS) ─────── */
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(20px) scale(0.98); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    /* top accent stripe */
+    .card::before {
+      content: '';
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, #3a72d4 0%, var(--blue) 50%, #88b5f8 100%);
+    }
+
+    /* ── Header ────────────────────────────── */
+    .header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .icon-badge {
+      width: 62px;
+      height: 62px;
+      border-radius: 18px;
+      background: var(--blue-pale);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      position: relative;
+    }
+
+    .icon-badge::after {
+      content: '';
+      position: absolute;
+      inset: -1px;
+      border-radius: 19px;
+      background: linear-gradient(135deg, rgba(86,144,240,0.35), transparent);
+      z-index: 0;
+    }
+
+    .icon-badge svg {
+      position: relative;
+      z-index: 1;
+      color: var(--blue);
+    }
+
+    .title {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text);
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      font-size: 0.875rem;
+      color: var(--muted);
+      font-weight: 400;
+      line-height: 1.55;
+    }
+
+    /* ── Field ─────────────────────────────── */
+    .field { margin-bottom: 20px; }
+
+    .field label {
+      display: block;
+      font-size: 0.775rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .input-wrap { position: relative; }
+
+    .input-wrap .prefix {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      padding: 0 12px 0 14px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--muted);
+      pointer-events: none;
+      user-select: none;
+      gap: 5px;
+      border-right: 1.5px solid var(--line);
+      white-space: nowrap;
+    }
+
+    .input-wrap .prefix span { font-size: 0.95rem; }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 15px 18px 15px 96px;
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text);
+      background: #FAFBFD;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      -webkit-appearance: none;
+    }
+
+    input[type="text"]::placeholder { color: #B0BCCE; font-weight: 400; }
+
+    input[type="text"]:focus {
+      border-color: var(--blue);
+      background: #fff;
+      box-shadow: 0 0 0 4px rgba(86,144,240,0.12);
+    }
+
+    /* ── Button ────────────────────────────── */
+    .btn {
+      width: 100%;
+      padding: 16px 24px;
+      background: var(--blue);
+      color: #fff;
+      border: none;
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 14px rgba(86,144,240,0.38), 0 1px 3px rgba(86,144,240,0.2);
+      -webkit-appearance: none;
+    }
+
+    .btn:hover:not(:disabled) {
+      background: var(--blue-deep);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(86,144,240,0.42), 0 2px 6px rgba(86,144,240,0.2);
+    }
+
+    .btn:active:not(:disabled) { transform: translateY(0); }
+
+    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+    .spin {
+      width: 18px; height: 18px;
+      border: 2.5px solid rgba(255,255,255,0.35);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+      flex-shrink: 0;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── Status ────────────────────────────── */
+    #statusBox {
+      display: none;
+      margin-top: 18px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      line-height: 1.45;
+      animation: fadeSlide 0.3s ease both;
+    }
+    @keyframes fadeSlide {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .st-success { background: #ECFDF5; color: #15803D; border: 1px solid #BBF7D0; }
+    .st-error   { background: #FEF2F2; color: #B91C1C; border: 1px solid #FECACA; }
+    .st-info    { background: var(--blue-pale); color: #1D4ED8; border: 1px solid var(--blue-mid); }
+
+    /* ── QR Result ─────────────────────────── */
+    #resultArea {
+      display: none;
+      margin-top: 28px;
+      animation: fadeSlide 0.45s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+    .divider span {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--muted);
+      white-space: nowrap;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--line);
+    }
+
+    /* QR wrapper */
+    .qr-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 100%;
+      gap: 14px;
+    }
+
+    .qr-frame {
+      background: #fff;
+      border: 1.5px solid var(--line);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: 0 4px 20px rgba(13,21,38,0.07);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    #qrImg {
+      width: 100%;
+      max-width: 260px;
+      height: auto;
+      aspect-ratio: 1;
+      border-radius: 8px;
+      display: block;
+      image-rendering: pixelated;
+    }
+
+    /* Pairing code */
+    .pair-block {
+      display: none;
+      width: 100%;
+      background: var(--blue-pale);
+      border: 1.5px solid var(--blue-mid);
+      border-radius: 16px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .pair-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      margin-bottom: 6px;
+    }
+    .pair-code {
+      font-size: 1.9rem;
+      font-weight: 800;
+      letter-spacing: 0.2em;
+      color: var(--text);
+    }
+    .pair-hint {
+      font-size: 0.72rem;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    /* Instruction steps */
+    .steps {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: #FAFBFD;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 12px 14px;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      background: var(--blue);
+      color: #fff;
+      font-size: 0.72rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-text {
+      font-size: 0.82rem;
+      color: var(--text);
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .step-text b { font-weight: 700; }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: 100%;
+      margin-top: 18px;
+      display: none;
+    }
+    .progress-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+    }
+    .progress-lbl { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
+    .progress-track {
+      height: 5px;
+      background: var(--line);
+      border-radius: 100px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      border-radius: 100px;
+      background: linear-gradient(90deg, var(--blue-deep), var(--blue));
+      width: 100%;
+    }
+
+    /* Secondary action row */
+    .action-row {
+      display: none;
+      margin-top: 14px;
+      gap: 10px;
+      width: 100%;
+    }
+    .action-row.visible { display: flex; }
+
+    .sec-btn {
+      flex: 1;
+      padding: 13px 10px;
+      background: transparent;
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 0.825rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+      white-space: nowrap;
+    }
+    .sec-btn.retry { color: var(--blue); }
+    .sec-btn.retry:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+    .sec-btn.change { color: var(--muted); }
+    .sec-btn.change:hover { background: #F8FAFD; border-color: #c8d4e8; color: var(--text); }
+
+    /* Retry */
+    .retry-btn {
+      display: none;
+      margin-top: 14px;
+      width: 100%;
+      padding: 13px;
+      background: transparent;
+      border: 1.5px solid var(--line);
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--blue);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .retry-btn:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
+
+    /* ── Two-column layout ─────────────────── */
+    .card {
+      background: var(--card);
+      width: 100%;
+      max-width: 400px;
+      border-radius: 28px;
+      padding: 40px 36px 36px;
+      box-shadow:
+        0 2px 4px rgba(86,144,240,0.04),
+        0 8px 24px rgba(13,21,38,0.08),
+        0 32px 64px rgba(13,21,38,0.06);
+      border: 1px solid rgba(232,237,245,0.9);
+      position: relative;
+      overflow: hidden;
+      animation: rise 0.5s cubic-bezier(0.22,1,0.36,1) both;
+      transition: max-width 0.45s cubic-bezier(0.22,1,0.36,1);
+    }
+
+    .card.expanded {
+      max-width: 760px;
+    }
+
+    .layout {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+    }
+
+    .col-left {
+      flex: 0 0 300px;
+      min-width: 0;
+    }
+
+    .col-divider {
+      display: none;
+      width: 1px;
+      background: var(--line);
+      align-self: stretch;
+      flex-shrink: 0;
+    }
+
+    .card.expanded .col-divider { display: block; }
+
+    .col-right {
+      flex: 1;
+      min-width: 0;
+      display: none;
+      animation: fadeSlide 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+
+    .card.expanded .col-right { display: flex; flex-direction: column; gap: 14px; }
+
+    /* ── Responsive ─ mobile ───────────────── */
+    @media (max-width: 600px) {
+      body { padding: 0; background: #fff; }
+      .card, .card.expanded {
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+        padding: 48px 24px 40px;
+        min-height: 100svh;
+        max-width: 100%;
+        animation: none;
+      }
+      .card::before { height: 2px; }
+      .layout { flex-direction: column; gap: 24px; }
+      .col-divider { display: none !important; width: 100%; height: 1px; }
+      .card.expanded .col-right { display: flex; }
+      #qrImg { width: 180px; height: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card" id="mainCard">
+ <div class="layout">
+
+  <!-- ── LEFT COLUMN: form ── -->
+  <div class="col-left">
+
+    <div class="header">
+      <div class="icon-badge">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
+                   A19.5 19.5 0 0 1 4.13 12a19.79 19.79 0 0 1-3.07-8.67
+                   A2 2 0 0 1 3.08 1.08h3a2 2 0 0 1 2 1.72
+                   c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91
+                   a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45
+                   c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
+        </svg>
+      </div>
+      <h1 class="title">Conectar WhatsApp</h1>
+      <p class="subtitle">Vincule sua conta ao Galaxy Chat<br>de forma rápida e segura.</p>
+    </div>
+
+    <div class="field">
+      <label for="phone">Número do WhatsApp</label>
+      <div class="input-wrap">
+        <div class="prefix"><span>🇧🇷</span> +55</div>
+        <input type="text" id="phone" placeholder="(18) 99999-9999" maxlength="15" inputmode="numeric">
+      </div>
+    </div>
+
+    <button class="btn" id="mainBtn" onclick="handleStart()">
+      <div class="spin" id="loader"></div>
+      <span id="btnLabel">Gerar QR Code</span>
+    </button>
+
+    <div id="statusBox"></div>
+
+    <!-- Shown after error -->
+    <div class="action-row" id="errorActionRow">
+      <button class="sec-btn retry" onclick="handleStart()">↺ Tentar novamente</button>
+      <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
+    </div>
+
+  </div><!-- /col-left -->
+
+  <!-- ── DIVIDER ── -->
+  <div class="col-divider"></div>
+
+  <!-- ── RIGHT COLUMN: QR ── -->
+  <div class="col-right" id="colRight">
+
+    <!-- QR Code -->
+    <div class="qr-frame" id="qrFrame" style="display:none;">
+      <img id="qrImg" alt="QR Code WhatsApp">
+    </div>
+
+    <!-- Pairing code -->
+    <div class="pair-block" id="pairBlock" style="display:none;">
+      <div class="pair-label">Código de Pareamento</div>
+      <div class="pair-code" id="pairCode">— — — —</div>
+      <div class="pair-hint">Use se não conseguir escanear o QR</div>
+    </div>
+
+    <!-- Steps -->
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text">Abra o <b>WhatsApp</b> no seu celular</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text">Acesse <b>⋮ Menu → Dispositivos Conectados</b></div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text">Toque em <b>Conectar dispositivo</b> e escaneie</div>
+      </div>
+    </div>
+
+    <!-- Countdown -->
+    <div class="progress-wrap" id="progressWrap" style="display:none; width:100%;">
+      <div class="progress-row">
+        <span class="progress-lbl">QR Code expira em</span>
+        <span class="progress-lbl" id="countdownLabel">30s</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
+    </div>
+
+    <!-- Actions after expiry -->
+    <div class="action-row" id="qrActionRow">
+      <button class="sec-btn retry" onclick="handleRetry()">↺ Novo QR Code</button>
+      <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
+    </div>
+
+  </div><!-- /col-right -->
+
+ </div><!-- /layout -->
+</div>
+
+<script>
+  const WEBHOOK = "https://apiworkflow.galaxychat.com.br/webhook/painel-de-conexao";
+  const TIMEOUT = 30;
+
+  let timer = null;
+  let countdown = null;
+
+  const $ = id => document.getElementById(id);
+
+  function setStatus(msg, type) {
+    const box = $('statusBox');
+    box.textContent = msg;
+    box.className = `st-${type}`;
+    box.style.display = 'block';
+    // show error actions only on error
+    $('errorActionRow').className = type === 'error' ? 'action-row visible' : 'action-row';
+  }
+
+  function clearStatus() {
+    $('statusBox').style.display = 'none';
+    $('errorActionRow').className = 'action-row';
+  }
+
+  function setLoading(on) {
+    $('loader').style.display = on ? 'block' : 'none';
+    $('btnLabel').textContent = on ? 'Processando...' : 'Gerar QR Code';
+    $('mainBtn').disabled = on;
+  }
+
+  function startCountdown() {
+    const wrap = $('progressWrap');
+    const fill = $('progressFill');
+    const lbl  = $('countdownLabel');
+    wrap.style.display = 'block';
+    $('qrActionRow').className = 'action-row';
+
+    fill.style.transition = 'none';
+    fill.style.width = '100%';
+
+    let remaining = TIMEOUT;
+    lbl.textContent = remaining + 's';
+
+    requestAnimationFrame(() => {
+      fill.style.transition = `width ${TIMEOUT}s linear`;
+      fill.style.width = '0%';
+    });
+
+    countdown = setInterval(() => {
+      remaining--;
+      lbl.textContent = remaining > 0 ? remaining + 's' : '0s';
+      if (remaining <= 0) clearInterval(countdown);
+    }, 1000);
+
+    timer = setTimeout(() => {
+      $('qrActionRow').className = 'action-row visible';
+    }, TIMEOUT * 1000);
+  }
+
+  function resetCountdown() {
+    clearTimeout(timer);
+    clearInterval(countdown);
+    $('progressWrap').style.display = 'none';
+    $('qrActionRow').className = 'action-row';
+  }
+
+  function handleChange() {
+    resetCountdown();
+    clearStatus();
+    // collapse back to single column
+    $('mainCard').classList.remove('expanded');
+    $('phone').value = '';
+    $('phone').focus();
+    setLoading(false);
+  }
+
+  async function handleStart() {
+    const raw   = $('phone').value.replace(/\D/g, '');
+    const phone = '55' + raw;
+
+    if (raw.length < 10 || raw.length > 11) {
+      setStatus('Número inválido. Digite DDD + número (ex: 18 99999-9999)', 'error');
+      return;
+    }
+
+    clearStatus();
+    // collapse right column while loading
+    $('mainCard').classList.remove('expanded');
+    resetCountdown();
+    setLoading(true);
+
+    try {
+      const res  = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numero: phone, tentativa: 1 })
+      });
+
+      if (!res.ok) throw new Error();
+      const raw2 = await res.json();
+      const data = Array.isArray(raw2) ? raw2[0] : raw2;   // ← webhook retorna [{...}]
+      setLoading(false);
+
+      if (data.conexao === 'inexistente') { setStatus('Instância não encontrada.', 'error'); return; }
+      if (data.connected) { setStatus('✓ Sua conta já está conectada!', 'success'); return; }
+
+      // Expand to two-column layout
+      $('mainCard').classList.add('expanded');
+
+      // qrcodeText = campo correto (como no código antigo)
+      const qrSrc = data.qrcodeText || data.qrcodePng || data.qrcode;
+      if (qrSrc) {
+        $('qrImg').src = qrSrc;
+        $('qrFrame').style.display = 'flex';
+      } else {
+        $('qrFrame').style.display = 'none';
+      }
+
+      const pair = data.pairingCode || data.pairing_code || data.code;
+      if (pair) {
+        $('pairCode').textContent = pair;
+        $('pairBlock').style.display = 'block';
+      } else {
+        $('pairBlock').style.display = 'none';
+      }
+
+      startCountdown();
+
+    } catch {
+      setLoading(false);
+      setStatus('Erro ao conectar. Verifique o servidor n8n.', 'error');
+    }
+  }
+
+  function handleRetry() {
+    resetCountdown();
+    $('mainCard').classList.remove('expanded');
+    handleStart();
+  }
+
+  $('phone').addEventListener('keydown', e => { if (e.key === 'Enter') handleStart(); });
+
+  // format input: (18) 99999-9999
+  $('phone').addEventListener('input', e => {
+    let v = e.target.value.replace(/\D/g, '').slice(0, 11);
+    if (v.length > 6) v = `(${v.slice(0,2)}) ${v.slice(2,7)}-${v.slice(7)}`;
+    else if (v.length > 2) v = `(${v.slice(0,2)}) ${v.slice(2)}`;
+    else if (v.length > 0) v = `(${v}`;
+    e.target.value = v;
+  });
+</script>
+</body>
+</html>
