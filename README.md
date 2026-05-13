@@ -1,0 +1,2 @@
+# Painel Conexão Galaxy Chat
+
