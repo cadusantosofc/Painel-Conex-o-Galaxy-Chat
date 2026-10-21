@@ -244,7 +244,7 @@
 
     .code-box { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
 
-    .qr-wrap { position: relative; width: min(272px, 100%); aspect-ratio: 1; color: var(--blue); transition: color 0.4s; }
+    .qr-wrap { position: relative; width: min(272px, 100%); aspect-ratio: 1; color: var(--blue); transition: color 0.4s, opacity 0.25s; }
     .qr-wrap.warn { color: var(--amber); }
     .qr-wrap.crit { color: var(--red); }
     .qr-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
@@ -423,7 +423,7 @@
         </div>
       </div>
 
-      <div class="timer" id="timerText">Expira em <b id="countdownLabel">30s</b></div>
+      <div class="timer" id="timerText">Expira em <b id="countdownLabel">45s</b></div>
 
       <div class="stage-actions">
         <button class="ghost" type="button" onclick="handleRetry()">Novo QR Code</button>
@@ -452,9 +452,11 @@
 
 <script>
   const WEBHOOK = "https://apiworkflow.galaxychat.com.br/webhook/painel-de-conexao";
-  const TIMEOUT = 30;
+  const TIMEOUT = 45;
+  const MAX_AUTO_REFRESH = 3;
 
   let countdown = null;
+  let autoRefreshCount = 0;
   const $ = id => document.getElementById(id);
 
   /* mini QR decorativo da ilustração */
@@ -517,8 +519,13 @@
       wrap.classList.toggle('warn', secs <= 10 && secs > 5);
       if (left <= 0) {
         stopCountdown();
-        $('codeBox').classList.add('is-expired');
-        $('timerText').style.visibility = 'hidden';
+        if (autoRefreshCount < MAX_AUTO_REFRESH) {
+          autoRefreshCount++;
+          handleAutoRefresh();
+        } else {
+          $('codeBox').classList.add('is-expired');
+          $('timerText').style.visibility = 'hidden';
+        }
       }
     };
     tick();
@@ -530,8 +537,51 @@
     countdown = null;
   }
 
+  async function handleAutoRefresh() {
+    const raw   = $('phone').value.replace(/\D/g, '');
+    const phone = '55' + raw;
+    if (raw.length < 10) return;
+
+    $('qrFrame').style.opacity = '0.35';
+    $('timerText').innerHTML = 'Atualizando QR Code…';
+
+    try {
+      const res = await fetch(WEBHOOK, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ numero: phone, tentativa: 1 })
+      });
+
+      $('qrFrame').style.opacity = '1';
+
+      if (!res.ok) throw new Error();
+      const raw2 = await res.json();
+      const data = Array.isArray(raw2) ? raw2[0] : raw2;
+
+      if (data.connected) {
+        $('connName').textContent  = data.nome || '';
+        $('connPhone').textContent = data.telefone ? formatPhone(data.telefone) : '';
+        setState('connected');
+        return;
+      }
+
+      const qrRaw = data.qrcodeText || data.qrcodePng || data.qrcode;
+      const pair  = data.pairingCode || data.pairing_code || data.code;
+
+      if (qrRaw) $('qrImg').src = normalizeQr(qrRaw);
+      if (pair)  $('pairCode').textContent = formatPairCode(pair);
+
+      startCountdown();
+    } catch {
+      $('qrFrame').style.opacity = '1';
+      $('codeBox').classList.add('is-expired');
+      $('timerText').style.visibility = 'hidden';
+    }
+  }
+
   function handleChange() {
     stopCountdown();
+    autoRefreshCount = 0;
     clearStatus();
     setState('idle');
     setLoading(false);
@@ -583,6 +633,7 @@
 
     clearStatus();
     stopCountdown();
+    autoRefreshCount = 0;
     setLoading(true);
     setState('loading');
 
