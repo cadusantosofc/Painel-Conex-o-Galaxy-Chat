@@ -825,10 +825,21 @@
 
       if (data.conexao === 'inexistente') { setStatus('Instância não encontrada.', 'error'); return; }
       if (data.connected) { setStatus('✓ Sua conta já está conectada!', 'success'); return; }
+      if (data.erro || data.limiteAtingido) {
+        setStatus(data.message || 'Tempo limite ao gerar o QR Code. Tente novamente.', 'error');
+        return;
+      }
+
+      const qrSrc = data.qrcodeText || data.qrcodePng || data.qrcode;
+      const pair = data.pairingCode || data.pairing_code || data.code;
+
+      if (!qrSrc && !pair) {
+        setStatus(data.message || 'QR Code não disponível no momento. Tente novamente em instantes.', 'error');
+        return;
+      }
 
       $('mainCard').classList.add('expanded');
 
-      const qrSrc = data.qrcodeText || data.qrcodePng || data.qrcode;
       if (qrSrc) {
         $('qrImg').src = qrSrc;
         $('qrFrame').style.display = 'flex';
@@ -836,7 +847,6 @@
         $('qrFrame').style.display = 'none';
       }
 
-      const pair = data.pairingCode || data.pairing_code || data.code;
       if (pair) {
         $('pairCode').textContent = pair;
         $('methodTabs').classList.add('visible');

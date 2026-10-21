@@ -3,7 +3,7 @@
   "nodes": [
     {
       "parameters": {
-        "jsCode": "const numero = $json.body.numero;\n\nif (!numero) {\n  throw new Error(\"Número inválido\");\n}\n\nreturn [\n  {\n    numero\n  }\n];"
+        "jsCode": "const numero = $json.body.numero;\n\nif (!numero) {\n  throw new Error(\"Número inválido\");\n}\n\nglobalThis._qrRetries = globalThis._qrRetries || {};\nglobalThis._qrRetries[numero] = 0;\n\nreturn [\n  {\n    numero\n  }\n];"
       },
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -201,13 +201,78 @@
     },
     {
       "parameters": {
-        "amount": 10
+        "jsCode": "const numero = $('2. FUNCTION').first().json.numero;\nglobalThis._qrRetries = globalThis._qrRetries || {};\nglobalThis._qrRetries[numero] = (globalThis._qrRetries[numero] || 0) + 1;\n\nconst MAX_TENTATIVAS = 3;\nconst tentativaAtual = globalThis._qrRetries[numero];\n\nif (tentativaAtual >= MAX_TENTATIVAS) {\n  delete globalThis._qrRetries[numero];\n  return [\n    {\n      json: {\n        erro: \"timeout\",\n        message: \"Tempo limite excedido ao tentar gerar o QR Code. Por favor, tente novamente.\",\n        limiteAtingido: true,\n        tentativa: tentativaAtual\n      }\n    }\n  ];\n}\n\nreturn [\n  {\n    json: {\n      ...$json,\n      limiteAtingido: false,\n      tentativa: tentativaAtual\n    }\n  }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        60,
+        224
+      ],
+      "id": "7b8e1f2a-5c4d-4e9b-8a12-9f3e4d5c6b7a",
+      "name": "Controlar Tentativas"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "c1f2e3d4-b5a6-7890-abcd-ef1234567890",
+              "leftValue": "={{ $json.limiteAtingido }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        260,
+        224
+      ],
+      "id": "8c9d0e1f-6a5b-4c3d-9e8f-7a6b5c4d3e2f",
+      "name": "Limite Atingido?"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"erro\": \"timeout\",\n  \"message\": \"{{ $json.message }}\"\n}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        480,
+        320
+      ],
+      "id": "9d0e1f2a-7b6c-5d4e-8f9a-0b1c2d3e4f5a",
+      "name": "Respond Timeout"
+    },
+    {
+      "parameters": {
+        "amount": 5
       },
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        80,
-        208
+        480,
+        140
       ],
       "id": "fff42ff9-9488-49e0-990a-800328b94094",
       "name": "Wait",
@@ -400,7 +465,7 @@
       "main": [
         [
           {
-            "node": "Wait",
+            "node": "Controlar Tentativas",
             "type": "main",
             "index": 0
           }
@@ -408,6 +473,35 @@
         [
           {
             "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Controlar Tentativas": {
+      "main": [
+        [
+          {
+            "node": "Limite Atingido?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limite Atingido?": {
+      "main": [
+        [
+          {
+            "node": "Respond Timeout",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
             "type": "main",
             "index": 0
           }
