@@ -2,10 +2,11 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>Conectar WhatsApp — Galaxy Chat</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
@@ -14,26 +15,32 @@
       --blue-pale:  #EDF3FF;
       --blue-mid:   #c0d1fa;
       --green:      #22C55E;
+      --green-pale: #ECFDF5;
       --red:        #EF4444;
+      --red-pale:   #FEF2F2;
       --text:       #0D1526;
       --muted:      #7B8FAF;
       --line:       #E4EAF4;
       --bg:         #EEF3FC;
       --card:       #FFFFFF;
-      --r:          22px;
-      --prefix-w:   108px;
+      --r-sm:  12px;
+      --r-md:  16px;
+      --r-lg:  22px;
+      --r-xl:  28px;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { -webkit-text-size-adjust: 100%; }
+
     body {
-      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
       background: var(--bg);
-      min-height: 100vh;
+      min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 32px 16px;
+      padding: clamp(0px, 4vw, 32px);
       background-image:
         radial-gradient(ellipse 90% 70% at 5% -15%,  rgba(79,128,237,0.14) 0%, transparent 60%),
         radial-gradient(ellipse 70% 60% at 95% 110%, rgba(79,128,237,0.10) 0%, transparent 60%),
@@ -41,9 +48,21 @@
       -webkit-font-smoothing: antialiased;
     }
 
+    button, input { font: inherit; }
+
+    :focus-visible {
+      outline: 2.5px solid var(--blue);
+      outline-offset: 2px;
+      border-radius: 6px;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+    }
+
     /* ── Card ───────────────────────────────── */
     @keyframes rise {
-      from { opacity: 0; transform: translateY(24px) scale(0.97); }
+      from { opacity: 0; transform: translateY(24px) scale(0.98); }
       to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
@@ -51,8 +70,7 @@
       background: var(--card);
       width: 100%;
       max-width: 420px;
-      border-radius: 28px;
-      padding: 0;
+      border-radius: var(--r-xl);
       box-shadow:
         0 1px 2px rgba(13,21,38,0.04),
         0 4px 12px rgba(79,128,237,0.06),
@@ -65,9 +83,8 @@
       transition: max-width 0.5s cubic-bezier(0.22,1,0.36,1);
     }
 
-    .card.expanded { max-width: 780px; }
+    .card.expanded { max-width: 760px; }
 
-    /* accent top bar */
     .card::before {
       content: '';
       position: absolute;
@@ -77,7 +94,6 @@
       z-index: 1;
     }
 
-    /* subtle inner glow top */
     .card::after {
       content: '';
       position: absolute;
@@ -87,42 +103,36 @@
       pointer-events: none;
     }
 
-    /* ── Layout ─────────────────────────────── */
+    /* ── Layout: mobile-first single column ──── */
     .layout {
       display: flex;
-      gap: 0;
-      align-items: flex-start;
+      flex-direction: column;
     }
 
     .col-left {
-      flex: 0 0 380px;
       min-width: 0;
-      max-width: 100%;
-      padding: 44px 36px 40px;
+      padding: clamp(32px, 7vw, 44px) clamp(22px, 6vw, 36px) clamp(26px, 6vw, 40px);
     }
 
-    .col-divider {
-      display: none;
-      width: 1px;
-      background: var(--line);
-      align-self: stretch;
-      flex-shrink: 0;
-    }
-
-    .card.expanded .col-divider { display: block; }
+    .col-divider { display: none; }
 
     .col-right {
-      flex: 1;
       min-width: 0;
       display: none;
-      padding: 36px 32px 36px 28px;
+      padding: 4px clamp(22px, 6vw, 36px) clamp(28px, 6vw, 40px);
+      flex-direction: column;
+      gap: 18px;
       animation: fadeSlide 0.45s cubic-bezier(0.22,1,0.36,1) both;
     }
 
-    .card.expanded .col-right {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
+    .card.expanded .col-right { display: flex; }
+
+    /* Side-by-side once there's room for both columns */
+    @media (min-width: 860px) {
+      .card.expanded .layout { flex-direction: row; align-items: stretch; }
+      .card.expanded .col-left { flex: 0 0 348px; padding: 44px 32px 40px 36px; }
+      .card.expanded .col-divider { display: block; width: 1px; background: var(--line); align-self: stretch; flex-shrink: 0; }
+      .card.expanded .col-right { flex: 1; padding: 36px 32px 36px 28px; }
     }
 
     /* ── Header ─────────────────────────────── */
@@ -131,35 +141,32 @@
       flex-direction: column;
       align-items: center;
       text-align: center;
-      margin-bottom: 36px;
+      margin-bottom: 34px;
     }
 
     .icon-badge {
-      width: 64px;
-      height: 64px;
-      border-radius: 20px;
+      width: 60px;
+      height: 60px;
+      border-radius: 18px;
       background: var(--blue-pale);
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 22px;
-      position: relative;
+      margin-bottom: 20px;
       box-shadow:
         0 0 0 1px rgba(79,128,237,0.15),
         0 4px 12px rgba(79,128,237,0.16),
         inset 0 1px 0 rgba(255,255,255,0.8);
     }
 
-    .icon-badge svg {
-      color: var(--blue);
-    }
+    .icon-badge svg { color: var(--blue); }
 
     .title {
-      font-size: 1.65rem;
+      font-size: clamp(1.4rem, 1.1rem + 1.1vw, 1.6rem);
       font-weight: 900;
       color: var(--text);
-      letter-spacing: -0.035em;
-      line-height: 1.13;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
     }
 
     .subtitle {
@@ -171,50 +178,41 @@
     }
 
     /* ── Field ──────────────────────────────── */
-    .field { margin-bottom: 22px; }
+    .field { margin-bottom: 20px; }
 
     .field label {
       display: block;
-      font-size: 0.72rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.09em;
+      font-size: 0.8rem;
+      font-weight: 700;
       color: var(--muted);
-      margin-bottom: 10px;
+      margin-bottom: 9px;
     }
 
-    /* Phone input row */
     .phone-row {
       display: flex;
-      gap: 10px;
+      gap: 9px;
       align-items: stretch;
     }
 
-    /* Country code chip */
     .country-chip {
       display: flex;
       align-items: center;
       gap: 7px;
-      padding: 0 16px;
-      height: 54px;
+      padding: 0 14px;
+      height: 52px;
       background: var(--blue-pale);
       border: 1.5px solid var(--blue-mid);
-      border-radius: 16px;
+      border-radius: var(--r-md);
       flex-shrink: 0;
       white-space: nowrap;
       user-select: none;
-      cursor: default;
     }
 
-    .country-chip .flag {
-      display: flex;
-      align-items: center;
-      flex-shrink: 0;
-    }
+    .country-chip .flag { display: flex; align-items: center; flex-shrink: 0; }
 
     .country-chip .flag img {
-      width: 24px;
-      height: 17px;
+      width: 22px;
+      height: 16px;
       border-radius: 3px;
       display: block;
       object-fit: cover;
@@ -222,23 +220,22 @@
     }
 
     .country-chip .code {
-      font-size: 0.9rem;
+      font-size: 0.88rem;
       font-weight: 800;
       color: var(--blue-deep);
       letter-spacing: 0.02em;
     }
 
-    /* Input */
     input[type="text"] {
       flex: 1;
+      min-width: 0;
       width: 100%;
-      height: 54px;
-      padding: 0 18px;
+      height: 52px;
+      padding: 0 16px;
       border: 1.5px solid var(--line);
-      border-radius: 16px;
-      font-family: inherit;
-      font-size: 1rem;
+      border-radius: var(--r-md);
       font-weight: 600;
+      font-size: 1rem;
       color: var(--text);
       background: #FAFBFE;
       outline: none;
@@ -247,11 +244,7 @@
       letter-spacing: 0.01em;
     }
 
-    input[type="text"]::placeholder {
-      color: #B8C4D8;
-      font-weight: 400;
-      letter-spacing: 0;
-    }
+    input[type="text"]::placeholder { color: #B8C4D8; font-weight: 400; letter-spacing: 0; }
 
     input[type="text"]:focus {
       border-color: var(--blue);
@@ -262,13 +255,12 @@
     /* ── Button ─────────────────────────────── */
     .btn {
       width: 100%;
-      height: 54px;
+      height: 52px;
       padding: 0 24px;
       background: var(--blue);
       color: #fff;
       border: none;
-      border-radius: 16px;
-      font-family: inherit;
+      border-radius: var(--r-md);
       font-size: 0.95rem;
       font-weight: 800;
       letter-spacing: 0.01em;
@@ -282,7 +274,6 @@
         0 1px 2px rgba(53,96,204,0.3),
         0 4px 16px rgba(79,128,237,0.4),
         inset 0 1px 0 rgba(255,255,255,0.15);
-      -webkit-appearance: none;
       position: relative;
       overflow: hidden;
     }
@@ -305,13 +296,7 @@
         inset 0 1px 0 rgba(255,255,255,0.15);
     }
 
-    .btn:active:not(:disabled) {
-      transform: translateY(0);
-      box-shadow:
-        0 1px 3px rgba(53,96,204,0.2),
-        0 3px 10px rgba(79,128,237,0.3);
-    }
-
+    .btn:active:not(:disabled) { transform: translateY(0); }
     .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
 
     .spin {
@@ -329,8 +314,8 @@
     #statusBox {
       display: none;
       margin-top: 16px;
-      padding: 14px 16px;
-      border-radius: 14px;
+      padding: 13px 15px;
+      border-radius: var(--r-sm);
       font-size: 0.86rem;
       font-weight: 600;
       line-height: 1.5;
@@ -340,17 +325,12 @@
       from { opacity: 0; transform: translateY(-6px); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    .st-success { background: #ECFDF5; color: #15803D; border: 1.5px solid #BBF7D0; }
-    .st-error   { background: #FEF2F2; color: #B91C1C; border: 1.5px solid #FECACA; }
-    .st-info    { background: var(--blue-pale); color: #1D4ED8; border: 1.5px solid var(--blue-mid); }
+    .st-success { background: var(--green-pale); color: #15803D; border: 1.5px solid #BBF7D0; }
+    .st-error   { background: var(--red-pale);   color: #B91C1C; border: 1.5px solid #FECACA; }
+    .st-info    { background: var(--blue-pale);  color: #1D4ED8; border: 1.5px solid var(--blue-mid); }
 
     /* ── Secondary action row ───────────────── */
-    .action-row {
-      display: none;
-      margin-top: 14px;
-      gap: 10px;
-      width: 100%;
-    }
+    .action-row { display: none; margin-top: 14px; gap: 10px; width: 100%; }
     .action-row.visible { display: flex; }
 
     .sec-btn {
@@ -358,8 +338,7 @@
       padding: 13px 10px;
       background: transparent;
       border: 1.5px solid var(--line);
-      border-radius: var(--r);
-      font-family: inherit;
+      border-radius: var(--r-lg);
       font-size: 0.82rem;
       font-weight: 700;
       cursor: pointer;
@@ -371,12 +350,12 @@
     .sec-btn.change { color: var(--muted); }
     .sec-btn.change:hover { background: #F7FAFF; border-color: #c8d4e8; color: var(--text); }
 
-    /* ── QR / Right column ──────────────────── */
+    /* ── QR ─────────────────────────────────── */
     .qr-frame {
       background: #fff;
       border: 1.5px solid var(--line);
-      border-radius: 22px;
-      padding: 16px;
+      border-radius: var(--r-lg);
+      padding: 18px;
       box-shadow:
         0 2px 8px rgba(13,21,38,0.06),
         0 8px 24px rgba(13,21,38,0.05);
@@ -388,7 +367,7 @@
 
     #qrImg {
       width: 100%;
-      max-width: 240px;
+      max-width: 232px;
       height: auto;
       aspect-ratio: 1;
       border-radius: 8px;
@@ -396,81 +375,68 @@
       image-rendering: pixelated;
     }
 
-    /* Method tabs */
-    .method-tabs {
-      display: none;
-      width: 100%;
-      background: var(--blue-pale);
-      border-radius: 13px;
-      padding: 4px;
-      gap: 4px;
-    }
-    .method-tabs.visible { display: flex; }
-
-    .tab-btn {
-      flex: 1;
-      padding: 9px 10px;
-      border: none;
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 0.78rem;
-      font-weight: 700;
-      cursor: pointer;
-      background: transparent;
-      color: var(--muted);
-      transition: background 0.18s, color 0.18s, box-shadow 0.18s;
-    }
-    .tab-btn.active {
-      background: #fff;
-      color: var(--blue);
-      box-shadow: 0 1px 5px rgba(13,21,38,0.09);
-    }
-
-    /* Pairing code */
+    /* ── Pairing code (shown under the QR) ──── */
     .pair-block {
       display: none;
       width: 100%;
       background: var(--blue-pale);
       border: 1.5px solid var(--blue-mid);
-      border-radius: 18px;
-      padding: 18px 20px;
+      border-radius: var(--r-lg);
+      padding: 16px 18px;
       text-align: center;
+      position: relative;
     }
     .pair-label {
-      font-size: 0.68rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--blue);
-      margin-bottom: 7px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--blue-deep);
+      margin-bottom: 8px;
+    }
+    .pair-code-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
     }
     .pair-code {
-      font-size: 2rem;
-      font-weight: 900;
-      letter-spacing: 0.22em;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: clamp(1.4rem, 1.1rem + 1.4vw, 1.7rem);
+      font-weight: 700;
+      letter-spacing: 0.12em;
       color: var(--text);
+      font-variant-numeric: tabular-nums;
     }
+    .copy-btn {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 10px;
+      border: 1.5px solid var(--blue-mid);
+      background: #fff;
+      color: var(--blue-deep);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.18s, transform 0.12s;
+    }
+    .copy-btn:hover { background: var(--blue-pale); }
+    .copy-btn:active { transform: scale(0.93); }
+    .copy-btn svg { width: 15px; height: 15px; }
     .pair-hint {
-      font-size: 0.72rem;
+      font-size: 0.74rem;
       color: var(--muted);
-      margin-top: 7px;
+      margin-top: 8px;
       font-weight: 500;
     }
 
-    /* Steps */
-    .steps {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-    .steps-pair { display: none; }
+    /* ── Steps ──────────────────────────────── */
+    .steps { width: 100%; display: none; flex-direction: column; gap: 8px; }
+    .steps.visible { display: flex; }
 
     .steps-title {
-      font-size: 0.65rem;
-      font-weight: 800;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
+      font-size: 0.78rem;
+      font-weight: 700;
       color: var(--muted);
       margin-bottom: 2px;
     }
@@ -481,20 +447,20 @@
       gap: 12px;
       background: #F8FAFD;
       border: 1px solid var(--line);
-      border-radius: 14px;
+      border-radius: var(--r-md);
       padding: 11px 14px;
       transition: border-color 0.2s, background 0.2s;
     }
     .step:hover { background: #fff; border-color: var(--blue-mid); }
 
     .step-num {
-      width: 26px;
-      height: 26px;
+      width: 25px;
+      height: 25px;
       border-radius: 8px;
       background: linear-gradient(135deg, var(--blue-deep), var(--blue));
       color: #fff;
       font-size: 0.7rem;
-      font-weight: 900;
+      font-weight: 800;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -502,32 +468,14 @@
       box-shadow: 0 2px 6px rgba(79,128,237,0.3);
     }
 
-    .step-text {
-      font-size: 0.82rem;
-      color: var(--text);
-      font-weight: 500;
-      line-height: 1.4;
-    }
+    .step-text { font-size: 0.83rem; color: var(--text); font-weight: 500; line-height: 1.45; }
     .step-text b { font-weight: 700; color: var(--text); }
 
-    /* Progress bar */
-    .progress-wrap {
-      width: 100%;
-      display: none;
-    }
-    .progress-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-    }
+    /* ── Progress bar ───────────────────────── */
+    .progress-wrap { width: 100%; display: none; }
+    .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
     .progress-lbl { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
-    .progress-track {
-      height: 5px;
-      background: var(--line);
-      border-radius: 100px;
-      overflow: hidden;
-    }
+    .progress-track { height: 5px; background: var(--line); border-radius: 100px; overflow: hidden; }
     .progress-fill {
       height: 100%;
       border-radius: 100px;
@@ -535,59 +483,28 @@
       width: 100%;
     }
 
-    /* QR action row */
-    #qrActionRow {
-      display: none;
-      margin-top: 4px;
-      gap: 10px;
-      width: 100%;
-    }
+    #qrActionRow { display: none; margin-top: 2px; gap: 10px; width: 100%; }
     #qrActionRow.visible { display: flex; }
 
-    /* ── Responsive ─ mobile ─────────────────── */
-    @media (max-width: 600px) {
-      body {
-        padding: 0;
-        background: #fff;
-        align-items: flex-start;
-        justify-content: center;
-      }
+    /* ── Small phones ───────────────────────── */
+    @media (max-width: 480px) {
+      body { padding: 0; background: #fff; align-items: flex-start; justify-content: center; }
       .card, .card.expanded {
         border-radius: 0;
         box-shadow: none;
         border: none;
         min-height: 100svh;
-        width: 100%;
         max-width: 100%;
         animation: none;
       }
-      .card::before { height: 3px; }
-      .card::after  { height: 80px; }
-      .col-left {
-        padding: 52px 24px 36px;
-        flex: none;
-        width: 100%;
-      }
-      .layout {
-        flex-direction: column;
-        gap: 0;
-        width: 100%;
-      }
-      .col-divider { display: none !important; }
-      .col-right {
-        width: 100%;
-        padding: 0 24px 40px;
-      }
-      .card.expanded .col-right {
-        display: flex;
-        width: 100%;
-      }
-      #qrImg { max-width: 200px; }
-      .header { margin-bottom: 30px; }
-      .title  { font-size: 1.5rem; }
-      .country-chip { padding: 0 14px; height: 50px; }
-      input[type="text"] { height: 50px; font-size: 0.95rem; }
-      .btn { height: 50px; }
+      .card::after { height: 80px; }
+      .header { margin-bottom: 28px; }
+      #qrImg { max-width: 208px; }
+      .country-chip { padding: 0 12px; }
+    }
+
+    @media (max-width: 340px) {
+      .country-chip .code { display: none; }
     }
   </style>
 </head>
@@ -596,12 +513,12 @@
 <div class="card" id="mainCard">
  <div class="layout">
 
-  <!-- ── LEFT COLUMN: form ── -->
+  <!-- ── FORM ── -->
   <div class="col-left">
 
     <div class="header">
       <div class="icon-badge">
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none"
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
                    A19.5 19.5 0 0 1 4.13 12a19.79 19.79 0 0 1-3.07-8.67
@@ -619,9 +536,7 @@
       <label for="phone">Número do WhatsApp</label>
       <div class="phone-row">
         <div class="country-chip">
-          <span class="flag">
-            <img src="https://flagcdn.com/w40/br.png" alt="Brasil">
-          </span>
+          <span class="flag"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"></span>
           <span class="code">+55</span>
         </div>
         <input type="text" id="phone" placeholder="(18) 99999-9999" maxlength="15" inputmode="numeric">
@@ -633,9 +548,8 @@
       <span id="btnLabel">Gerar QR Code</span>
     </button>
 
-    <div id="statusBox"></div>
+    <div id="statusBox" role="status" aria-live="polite"></div>
 
-    <!-- Shown after error -->
     <div class="action-row" id="errorActionRow">
       <button class="sec-btn retry" onclick="handleStart()">↺ Tentar novamente</button>
       <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
@@ -643,76 +557,53 @@
 
   </div><!-- /col-left -->
 
-  <!-- ── DIVIDER ── -->
   <div class="col-divider"></div>
 
-  <!-- ── RIGHT COLUMN: QR ── -->
+  <!-- ── QR + PAREAMENTO (mesma visualização) ── -->
   <div class="col-right" id="colRight">
 
-    <!-- Tabs QR / Código -->
-    <div class="method-tabs" id="methodTabs">
-      <button class="tab-btn active" id="tabQr"   onclick="switchTab('qr')">📷 Escanear QR</button>
-      <button class="tab-btn"        id="tabPair" onclick="switchTab('pair')">🔑 Inserir código</button>
-    </div>
-
-    <!-- QR Code -->
-    <div class="qr-frame" id="qrFrame" style="display:none;">
+    <div class="qr-frame" id="qrFrame">
       <img id="qrImg" alt="QR Code WhatsApp">
     </div>
 
-    <!-- Pairing code -->
-    <div class="pair-block" id="pairBlock" style="display:none;">
-      <div class="pair-label">Código de Pareamento</div>
-      <div class="pair-code" id="pairCode">— — — —</div>
+    <div class="pair-block" id="pairBlock">
+      <div class="pair-label">Código de pareamento</div>
+      <div class="pair-code-row">
+        <div class="pair-code" id="pairCode">— — — —</div>
+        <button class="copy-btn" id="copyBtn" onclick="copyPairCode()" aria-label="Copiar código" title="Copiar código">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="9" width="12" height="12" rx="2.5"/>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+          </svg>
+        </button>
+      </div>
       <div class="pair-hint">Digite este código no WhatsApp</div>
     </div>
 
-    <!-- Steps QR -->
-    <div class="steps steps-qr" id="stepsQr" style="display:flex; flex-direction:column; gap:8px;">
-      <div class="steps-title">Como escanear</div>
+    <div class="steps" id="stepsCombined">
+      <div class="steps-title">Como conectar</div>
       <div class="step">
         <div class="step-num">1</div>
         <div class="step-text">Abra o <b>WhatsApp</b> no seu celular</div>
       </div>
       <div class="step">
         <div class="step-num">2</div>
-        <div class="step-text">Acesse <b>⋮ Menu → Dispositivos Conectados</b></div>
+        <div class="step-text">Acesse <b>⋮ Menu → Dispositivos conectados</b></div>
       </div>
       <div class="step">
         <div class="step-num">3</div>
-        <div class="step-text">Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR</div>
+        <div class="step-text" id="stepThree">Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima</div>
       </div>
     </div>
 
-    <!-- Steps Pareamento -->
-    <div class="steps steps-pair" id="stepsPair" style="display:none; flex-direction:column; gap:8px;">
-      <div class="steps-title">Como usar o código</div>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Abra o <b>WhatsApp</b> no seu celular</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Acesse <b>⋮ Menu → Dispositivos Conectados → Conectar dispositivo</b></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text">Toque em <b>"Usar número de telefone"</b> e digite o código acima</div>
-      </div>
-    </div>
-
-    <!-- Countdown -->
-    <div class="progress-wrap" id="progressWrap" style="display:none; width:100%;">
+    <div class="progress-wrap" id="progressWrap">
       <div class="progress-row">
         <span class="progress-lbl">QR Code expira em</span>
         <span class="progress-lbl" id="countdownLabel">30s</span>
       </div>
-      <div class="progress-track">
-        <div class="progress-fill" id="progressFill"></div>
-      </div>
+      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
     </div>
 
-    <!-- Actions after expiry -->
     <div class="action-row" id="qrActionRow">
       <button class="sec-btn retry" onclick="handleRetry()">↺ Novo QR Code</button>
       <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
@@ -797,6 +688,24 @@
     setLoading(false);
   }
 
+  function formatPairCode(code) {
+    code = String(code).trim();
+    if (code.length === 8 && !code.includes('-') && !code.includes(' ')) {
+      return code.slice(0, 4) + ' ' + code.slice(4);
+    }
+    return code;
+  }
+
+  function copyPairCode() {
+    const text = $('pairCode').textContent.replace(/\s/g, '');
+    navigator.clipboard?.writeText(text).then(() => {
+      const btn = $('copyBtn');
+      const original = btn.innerHTML;
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      setTimeout(() => { btn.innerHTML = original; }, 1400);
+    });
+  }
+
   async function handleStart() {
     const raw   = $('phone').value.replace(/\D/g, '');
     const phone = '55' + raw;
@@ -840,6 +749,7 @@
 
       $('mainCard').classList.add('expanded');
 
+      // QR
       if (qrSrc) {
         $('qrImg').src = qrSrc;
         $('qrFrame').style.display = 'flex';
@@ -847,15 +757,24 @@
         $('qrFrame').style.display = 'none';
       }
 
+      // Pareamento — exibido logo abaixo do QR, na mesma tela
       if (pair) {
-        $('pairCode').textContent = pair;
-        $('methodTabs').classList.add('visible');
-        switchTab('qr');
+        $('pairCode').textContent = formatPairCode(pair);
+        $('pairBlock').style.display = 'block';
       } else {
         $('pairBlock').style.display = 'none';
-        $('methodTabs').classList.remove('visible');
-        $('stepsPair').style.display = 'none';
       }
+
+      // Texto do passo 3 se adapta ao que está disponível
+      const stepThree = $('stepThree');
+      if (qrSrc && pair) {
+        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima — ou toque em <b>"Usar número de telefone"</b> e digite o código abaixo';
+      } else if (qrSrc) {
+        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima';
+      } else if (pair) {
+        stepThree.innerHTML = 'Toque em <b>"Usar número de telefone"</b> e digite o código acima';
+      }
+      $('stepsCombined').classList.add('visible');
 
       startCountdown();
 
@@ -863,17 +782,6 @@
       setLoading(false);
       setStatus('Erro ao conectar. Verifique o servidor n8n.', 'error');
     }
-  }
-
-  function switchTab(tab) {
-    const isQr = tab === 'qr';
-    $('tabQr').classList.toggle('active', isQr);
-    $('tabPair').classList.toggle('active', !isQr);
-    $('qrFrame').style.display    = isQr ? 'flex'  : 'none';
-    $('pairBlock').style.display  = isQr ? 'none'  : 'block';
-    $('stepsQr').style.display    = isQr ? 'flex'  : 'none';
-    $('stepsPair').style.display  = isQr ? 'none'  : 'flex';
-    $('progressWrap').style.display = isQr && $('progressWrap').dataset.active ? 'block' : 'none';
   }
 
   function handleRetry() {

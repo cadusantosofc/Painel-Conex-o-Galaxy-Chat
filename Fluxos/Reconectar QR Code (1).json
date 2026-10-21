@@ -1,5 +1,4 @@
 {
-  "name": "Reconectar QR Code",
   "nodes": [
     {
       "parameters": {
@@ -8,10 +7,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        -1728,
-        128
+        -704,
+        -16
       ],
-      "id": "200f5bb3-8866-4bab-8502-6e8bf9dc436b",
+      "id": "f7d43a7a-768f-4191-b96e-01b6c1a6da68",
       "name": "2. FUNCTION"
     },
     {
@@ -34,10 +33,10 @@
       "type": "n8n-nodes-base.webhook",
       "typeVersion": 2.1,
       "position": [
-        -1984,
-        128
+        -960,
+        -16
       ],
-      "id": "542aebd6-a84b-4a22-baf2-fcf279129fcb",
+      "id": "bd808762-6b41-49b4-a589-699402286bc4",
       "name": "1. WEBHOOK",
       "webhookId": "2e9efb4b-e025-494f-acce-b3985b8e00de"
     },
@@ -70,10 +69,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -800,
-        144
+        224,
+        0
       ],
-      "id": "cc9b53f6-39a3-41a4-ae08-302b9d8c610d",
+      "id": "b74f5829-5f8b-4d48-a6c8-d414765260a8",
       "name": "6. IF NODE"
     },
     {
@@ -87,10 +86,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -400,
-        0
+        624,
+        -144
       ],
-      "id": "c772edc4-3d15-4dad-b07b-4f8cb4a34eef",
+      "id": "c69fcbb6-a7b9-4479-bbf2-83a74b466128",
       "name": "Respond to Webhook"
     },
     {
@@ -101,10 +100,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        336,
+        1296,
         240
       ],
-      "id": "734a8270-7503-4b94-86fb-f5002556876b",
+      "id": "754418dd-5f6c-496d-a340-bd343223ace0",
       "name": "Respond to Webhook1"
     },
     {
@@ -128,10 +127,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -1040,
-        144
+        -16,
+        0
       ],
-      "id": "ba1fd09c-e3c4-40de-9630-f902006cc049",
+      "id": "d158ce29-808a-4792-9fac-357d132d23ac",
       "name": "Trazer status"
     },
     {
@@ -159,10 +158,10 @@
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.4,
       "position": [
-        -448,
-        224
+        624,
+        32
       ],
-      "id": "bb239c86-bb75-412b-a9c1-64211c63fa9b",
+      "id": "e880cbd0-0604-4ec6-9326-269ce39d3308",
       "name": "BUSCAR QR CODE"
     },
     {
@@ -193,10 +192,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -176,
-        224
+        848,
+        80
       ],
-      "id": "ccdbcb13-0bb9-4eec-932e-a097ba2971a4",
+      "id": "f45ad919-8854-4e9d-9ec8-12ab971ab0d5",
       "name": "If"
     },
     {
@@ -206,10 +205,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        60,
-        224
+        1088,
+        -16
       ],
-      "id": "7b8e1f2a-5c4d-4e9b-8a12-9f3e4d5c6b7a",
+      "id": "40717350-0597-4423-b27f-2bee21e2d969",
       "name": "Controlar Tentativas"
     },
     {
@@ -241,10 +240,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        260,
-        224
+        1296,
+        -16
       ],
-      "id": "8c9d0e1f-6a5b-4c3d-9e8f-7a6b5c4d3e2f",
+      "id": "17b4be7d-9d1b-4110-9601-e48ec1e69a12",
       "name": "Limite Atingido?"
     },
     {
@@ -258,23 +257,21 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        480,
-        320
+        1552,
+        -176
       ],
-      "id": "9d0e1f2a-7b6c-5d4e-8f9a-0b1c2d3e4f5a",
+      "id": "39cc916f-4672-4b9f-8883-ad1edef57ec7",
       "name": "Respond Timeout"
     },
     {
-      "parameters": {
-        "amount": 5
-      },
+      "parameters": {},
       "type": "n8n-nodes-base.wait",
       "typeVersion": 1.1,
       "position": [
-        480,
-        140
+        1552,
+        0
       ],
-      "id": "fff42ff9-9488-49e0-990a-800328b94094",
+      "id": "af9f323d-5054-4daa-832e-42d411cc81db",
       "name": "Wait",
       "webhookId": "24184740-de91-4869-8a4c-0df1c48771e4"
     },
@@ -307,10 +304,10 @@
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
       "position": [
-        -1296,
-        128
+        -272,
+        -16
       ],
-      "id": "1e887ce7-fd4c-4c89-a715-040f9e5e1ab8",
+      "id": "2713ae25-ed87-4ce1-90da-ad3b176e16e5",
       "name": "Esta vazio?"
     },
     {
@@ -324,10 +321,10 @@
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.5,
       "position": [
-        -176,
-        0
+        848,
+        -144
       ],
-      "id": "18d5d71f-5cff-4a36-9f12-74e2e532f4f0",
+      "id": "a09c1c54-da64-460d-b791-156fb83b197f",
       "name": "Respond to Webhook2"
     },
     {
@@ -339,10 +336,10 @@
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.7,
       "position": [
-        -1504,
-        128
+        -480,
+        -16
       ],
-      "id": "9a0fd1f9-ed2b-466d-bb32-51491882bd30",
+      "id": "403e2285-558f-461d-87f5-55a9eb366e1f",
       "name": "Buscar dados no Banco",
       "alwaysOutputData": true,
       "credentials": {
@@ -354,50 +351,6 @@
       "continueOnFail": true
     }
   ],
-  "pinData": {
-    "1. WEBHOOK": [
-      {
-        "json": {
-          "headers": {
-            "host": "apiworkflow.galaxychat.com.br",
-            "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/154.0.0.0 Safari/537.36",
-            "content-length": "40",
-            "accept": "*/*",
-            "accept-encoding": "gzip, deflate, br, zstd",
-            "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
-            "content-type": "application/json",
-            "dnt": "1",
-            "origin": "https://status.galaxychat.com.br",
-            "priority": "u=1, i",
-            "referer": "https://status.galaxychat.com.br/",
-            "sec-ch-ua": "\"Chromium\";v=\"154\", \"Google Chrome\";v=\"154\", \"Not A(Brand\";v=\"99\"",
-            "sec-ch-ua-mobile": "?0",
-            "sec-ch-ua-platform": "\"Windows\"",
-            "sec-fetch-dest": "empty",
-            "sec-fetch-mode": "cors",
-            "sec-fetch-site": "same-site",
-            "x-forwarded-for": "187.33.206.24",
-            "x-forwarded-host": "apiworkflow.galaxychat.com.br",
-            "x-forwarded-port": "443",
-            "x-forwarded-proto": "https",
-            "x-forwarded-server": "62b6bc3216dd",
-            "x-real-ip": "187.33.206.24"
-          },
-          "params": {},
-          "query": {},
-          "body": {
-            "numero": "5516936183988",
-            "tentativa": 1
-          },
-          "webhookUrl": "https://apiworkflow.galaxychat.com.br/webhook/painel-de-conexao",
-          "executionMode": "production"
-        },
-        "pairedItem": {
-          "item": 0
-        }
-      }
-    ]
-  },
   "connections": {
     "2. FUNCTION": {
       "main": [
@@ -549,17 +502,46 @@
       ]
     }
   },
-  "active": true,
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate"
+  "pinData": {
+    "1. WEBHOOK": [
+      {
+        "headers": {
+          "host": "apiworkflow.galaxychat.com.br",
+          "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/155.0.0.0 Safari/537.36",
+          "content-length": "40",
+          "accept": "*/*",
+          "accept-encoding": "gzip, deflate, br, zstd",
+          "accept-language": "pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7",
+          "content-type": "application/json",
+          "origin": "https://status.galaxychat.com.br",
+          "priority": "u=1, i",
+          "referer": "https://status.galaxychat.com.br/",
+          "sec-ch-ua": "\"Google Chrome\";v=\"155\", \"Chromium\";v=\"155\", \"Not(A:Brand\";v=\"24\"",
+          "sec-ch-ua-mobile": "?0",
+          "sec-ch-ua-platform": "\"Windows\"",
+          "sec-fetch-dest": "empty",
+          "sec-fetch-mode": "cors",
+          "sec-fetch-site": "same-site",
+          "x-forwarded-for": "187.33.207.246",
+          "x-forwarded-host": "apiworkflow.galaxychat.com.br",
+          "x-forwarded-port": "443",
+          "x-forwarded-proto": "https",
+          "x-forwarded-server": "39f22656ac01",
+          "x-real-ip": "187.33.207.246"
+        },
+        "params": {},
+        "query": {},
+        "body": {
+          "numero": "5518996491630",
+          "tentativa": 1
+        },
+        "webhookUrl": "https://apiworkflow.galaxychat.com.br/webhook/painel-de-conexao",
+        "executionMode": "production"
+      }
+    ]
   },
-  "versionId": "ba8a1924-9061-4d0d-bb82-1fdb5db13c63",
   "meta": {
     "templateCredsSetupCompleted": true,
     "instanceId": "67940a0b519368b509cb4ef0a6346dae86756522ddde5dfbb454ce3de01c8286"
-  },
-  "nodeGroups": [],
-  "id": "JzfodZqcnpTKu5Hh",
-  "tags": []
+  }
 }
