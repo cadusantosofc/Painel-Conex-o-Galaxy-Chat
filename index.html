@@ -3,689 +3,540 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#F4F5FB">
   <title>Conectar WhatsApp — Galaxy Chat</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/png" sizes="192x192" href="logo.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="logo.png">
+  <link rel="apple-touch-icon" href="logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@600;700&display=swap" rel="stylesheet">
 
   <style>
     :root {
-      --blue:       #4F80ED;
-      --blue-deep:  #3560cc;
-      --blue-pale:  #EDF3FF;
-      --blue-mid:   #c0d1fa;
-      --green:      #22C55E;
-      --green-pale: #ECFDF5;
-      --red:        #EF4444;
-      --red-pale:   #FEF2F2;
-      --text:       #0D1526;
-      --muted:      #7B8FAF;
-      --line:       #E4EAF4;
-      --bg:         #EEF3FC;
-      --card:       #FFFFFF;
-      --r-sm:  12px;
-      --r-md:  16px;
-      --r-lg:  22px;
-      --r-xl:  28px;
+      --bg:          #F4F5FB;
+      --card:        #FFFFFF;
+      --ink:         #15172E;
+      --ink-2:       #4B5072;
+      --ink-3:       #8A8FAC;
+      --line:        #E5E7F2;
+      --line-strong: #D3D6E8;
+
+      --blue:        #5690F0;
+      --blue-deep:   #3A7AE8;
+      --blue-tint:   #EDF4FE;
+      --blue-mid:    #C2DCFB;
+
+      --green:       #12A150;
+      --green-tint:  #E7F7EE;
+      --amber:       #E39A0B;
+      --red:         #E5484D;
+      --red-tint:    #FDECEC;
+
+      --stage:       #EEF5FD;
+
+      --r-sm: 12px; --r-md: 14px; --r-lg: 20px; --r-xl: 28px;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { -webkit-text-size-adjust: 100%; }
+    button, input { font: inherit; color: inherit; }
+    button { cursor: pointer; }
 
     body {
-      font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
-      background: var(--bg);
+      font-family: 'Figtree', system-ui, sans-serif;
+      color: var(--ink);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 60% 50% at 0% 0%, rgba(86,144,240,0.12), transparent 70%),
+        radial-gradient(ellipse 50% 45% at 100% 100%, rgba(79,200,230,0.12), transparent 70%),
+        radial-gradient(circle, rgba(21,23,46,0.07) 1px, transparent 1.4px);
+      background-size: auto, auto, 22px 22px;
       min-height: 100svh;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: clamp(0px, 4vw, 32px);
-      background-image:
-        radial-gradient(ellipse 90% 70% at 5% -15%,  rgba(79,128,237,0.14) 0%, transparent 60%),
-        radial-gradient(ellipse 70% 60% at 95% 110%, rgba(79,128,237,0.10) 0%, transparent 60%),
-        radial-gradient(ellipse 50% 40% at 50% 50%,  rgba(79,128,237,0.04) 0%, transparent 70%);
+      padding: clamp(12px, 4vw, 40px);
       -webkit-font-smoothing: antialiased;
     }
 
-    button, input { font: inherit; }
-
-    :focus-visible {
-      outline: 2.5px solid var(--blue);
-      outline-offset: 2px;
-      border-radius: 6px;
-    }
+    :focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; border-radius: 8px; }
 
     @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+      *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
     }
 
-    /* ── Card ───────────────────────────────── */
-    @keyframes rise {
-      from { opacity: 0; transform: translateY(24px) scale(0.98); }
-      to   { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
+    /* ── Card ─────────────────────────────── */
     .card {
+      width: 100%;
+      max-width: 460px;
       background: var(--card);
-      width: 100%;
-      max-width: 420px;
       border-radius: var(--r-xl);
+      border: 1px solid var(--line);
       box-shadow:
-        0 1px 2px rgba(13,21,38,0.04),
-        0 4px 12px rgba(79,128,237,0.06),
-        0 16px 40px rgba(13,21,38,0.09),
-        0 40px 80px rgba(13,21,38,0.06);
-      border: 1px solid rgba(228,234,244,0.95);
-      position: relative;
+        0 1px 2px rgba(25,55,140,0.04),
+        0 12px 32px rgba(25,55,140,0.07),
+        0 40px 90px rgba(25,55,140,0.09);
       overflow: hidden;
-      animation: rise 0.55s cubic-bezier(0.22,1,0.36,1) both;
-      transition: max-width 0.5s cubic-bezier(0.22,1,0.36,1);
+      display: grid;
+      grid-template-columns: 1fr;
     }
 
-    .card.expanded { max-width: 760px; }
-
-    .card::before {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 3px;
-      background: linear-gradient(90deg, #2b56d4 0%, var(--blue) 45%, #8eb8ff 100%);
-      z-index: 1;
+    @media (min-width: 880px) {
+      .card { max-width: 980px; grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr); }
     }
 
-    .card::after {
-      content: '';
-      position: absolute;
-      inset: 0 0 auto 0;
-      height: 120px;
-      background: linear-gradient(180deg, rgba(79,128,237,0.04) 0%, transparent 100%);
-      pointer-events: none;
-    }
+    /* ── Left: form ───────────────────────── */
+    .form-pane { padding: clamp(28px, 6vw, 56px) clamp(22px, 5vw, 52px); display: flex; flex-direction: column; }
 
-    /* ── Layout: mobile-first single column ──── */
-    .layout {
-      display: flex;
-      flex-direction: column;
-    }
+    .brand { display: flex; align-items: center; margin-bottom: clamp(28px, 5vw, 44px); }
+    .brand-logo { height: 44px; width: auto; max-width: 200px; object-fit: contain; display: block; }
 
-    .col-left {
-      min-width: 0;
-      padding: clamp(32px, 7vw, 44px) clamp(22px, 6vw, 36px) clamp(26px, 6vw, 40px);
-    }
-
-    .col-divider { display: none; }
-
-    .col-right {
-      min-width: 0;
-      display: none;
-      padding: 4px clamp(22px, 6vw, 36px) clamp(28px, 6vw, 40px);
-      flex-direction: column;
-      gap: 18px;
-      animation: fadeSlide 0.45s cubic-bezier(0.22,1,0.36,1) both;
-    }
-
-    .card.expanded .col-right { display: flex; }
-
-    /* Side-by-side once there's room for both columns */
-    @media (min-width: 860px) {
-      .card.expanded .layout { flex-direction: row; align-items: stretch; }
-      .card.expanded .col-left { flex: 0 0 348px; padding: 44px 32px 40px 36px; }
-      .card.expanded .col-divider { display: block; width: 1px; background: var(--line); align-self: stretch; flex-shrink: 0; }
-      .card.expanded .col-right { flex: 1; padding: 36px 32px 36px 28px; }
-    }
-
-    /* ── Header ─────────────────────────────── */
-    .header {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-align: center;
-      margin-bottom: 34px;
-    }
-
-    .icon-badge {
-      width: 60px;
-      height: 60px;
-      border-radius: 18px;
-      background: var(--blue-pale);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-bottom: 20px;
-      box-shadow:
-        0 0 0 1px rgba(79,128,237,0.15),
-        0 4px 12px rgba(79,128,237,0.16),
-        inset 0 1px 0 rgba(255,255,255,0.8);
-    }
-
-    .icon-badge svg { color: var(--blue); }
-
-    .title {
-      font-size: clamp(1.4rem, 1.1rem + 1.1vw, 1.6rem);
-      font-weight: 900;
-      color: var(--text);
-      letter-spacing: -0.03em;
-      line-height: 1.15;
-    }
-
-    .subtitle {
-      margin-top: 9px;
-      font-size: 0.875rem;
-      color: var(--muted);
-      font-weight: 400;
-      line-height: 1.6;
-    }
-
-    /* ── Field ──────────────────────────────── */
-    .field { margin-bottom: 20px; }
-
-    .field label {
-      display: block;
-      font-size: 0.8rem;
+    h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
       font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 9px;
+      font-size: clamp(1.9rem, 1.35rem + 2.2vw, 2.65rem);
+      line-height: 1.04;
+      letter-spacing: -0.025em;
+      color: var(--ink);
+      max-width: 14ch;
     }
 
-    .phone-row {
-      display: flex;
-      gap: 9px;
-      align-items: stretch;
-    }
+    .lead { margin-top: 14px; font-size: 1rem; line-height: 1.6; color: var(--ink-2); max-width: 38ch; }
 
-    .country-chip {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-      padding: 0 14px;
-      height: 52px;
-      background: var(--blue-pale);
-      border: 1.5px solid var(--blue-mid);
-      border-radius: var(--r-md);
-      flex-shrink: 0;
-      white-space: nowrap;
-      user-select: none;
-    }
+    form { margin-top: clamp(24px, 4vw, 34px); }
 
-    .country-chip .flag { display: flex; align-items: center; flex-shrink: 0; }
+    label { display: block; font-size: 0.86rem; font-weight: 700; color: var(--ink); margin-bottom: 10px; }
 
-    .country-chip .flag img {
-      width: 22px;
-      height: 16px;
-      border-radius: 3px;
-      display: block;
-      object-fit: cover;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.18);
-    }
-
-    .country-chip .code {
-      font-size: 0.88rem;
-      font-weight: 800;
-      color: var(--blue-deep);
-      letter-spacing: 0.02em;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      min-width: 0;
-      width: 100%;
-      height: 52px;
-      padding: 0 16px;
-      border: 1.5px solid var(--line);
-      border-radius: var(--r-md);
-      font-weight: 600;
-      font-size: 1rem;
-      color: var(--text);
-      background: #FAFBFE;
-      outline: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      -webkit-appearance: none;
-      letter-spacing: 0.01em;
-    }
-
-    input[type="text"]::placeholder { color: #B8C4D8; font-weight: 400; letter-spacing: 0; }
-
-    input[type="text"]:focus {
-      border-color: var(--blue);
+    .phone-field {
+      display: flex; align-items: stretch;
+      height: 58px;
       background: #fff;
-      box-shadow: 0 0 0 4px rgba(79,128,237,0.13);
-    }
-
-    /* ── Button ─────────────────────────────── */
-    .btn {
-      width: 100%;
-      height: 52px;
-      padding: 0 24px;
-      background: var(--blue);
-      color: #fff;
-      border: none;
+      border: 1.5px solid var(--line-strong);
       border-radius: var(--r-md);
-      font-size: 0.95rem;
-      font-weight: 800;
-      letter-spacing: 0.01em;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
-      box-shadow:
-        0 1px 2px rgba(53,96,204,0.3),
-        0 4px 16px rgba(79,128,237,0.4),
-        inset 0 1px 0 rgba(255,255,255,0.15);
-      position: relative;
+      transition: border-color 0.2s, box-shadow 0.2s;
       overflow: hidden;
     }
+    .phone-field:hover { border-color: #BFC3DC; }
+    .phone-field:focus-within { border-color: var(--blue); box-shadow: 0 0 0 4px rgba(86,144,240,0.16); }
+    .phone-field.invalid { border-color: var(--red); box-shadow: 0 0 0 4px rgba(229,72,77,0.12); }
 
-    .btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, rgba(255,255,255,0.08) 0%, transparent 50%);
-      border-radius: inherit;
-      pointer-events: none;
+    .country {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 14px 0 16px;
+      background: #F7F8FC;
+      border-right: 1.5px solid var(--line);
+      user-select: none; flex-shrink: 0;
     }
+    .country img { width: 24px; height: 17px; border-radius: 3px; object-fit: cover; display: block; box-shadow: 0 0 0 1px rgba(21,23,46,0.12); }
+    .country span { font-weight: 700; font-size: 0.95rem; color: var(--ink-2); }
 
-    .btn:hover:not(:disabled) {
-      background: var(--blue-deep);
-      transform: translateY(-1px);
-      box-shadow:
-        0 2px 4px rgba(53,96,204,0.3),
-        0 8px 28px rgba(79,128,237,0.45),
-        inset 0 1px 0 rgba(255,255,255,0.15);
+    #phone {
+      flex: 1; min-width: 0; border: none; outline: none; background: transparent;
+      padding: 0 16px; font-size: 1.1rem; font-weight: 600; letter-spacing: 0.01em;
+      font-variant-numeric: tabular-nums;
     }
+    #phone::placeholder { color: #A9ADC6; font-weight: 500; }
 
+    .btn {
+      margin-top: 16px; width: 100%; height: 58px;
+      border: none; border-radius: var(--r-md);
+      background: var(--blue);
+      color: #fff; font-weight: 700; font-size: 1.02rem;
+      display: flex; align-items: center; justify-content: center; gap: 10px;
+      box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 20px rgba(86,144,240,0.32);
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn:hover:not(:disabled) { background: var(--blue-deep); transform: translateY(-1px); box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 12px 26px rgba(86,144,240,0.38); }
     .btn:active:not(:disabled) { transform: translateY(0); }
-    .btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+    .btn:disabled { opacity: 0.65; cursor: progress; }
 
-    .spin {
-      width: 18px; height: 18px;
-      border: 2.5px solid rgba(255,255,255,0.35);
-      border-top-color: #fff;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
-      flex-shrink: 0;
-    }
+    .spin { display: none; width: 18px; height: 18px; border: 2.5px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* ── Status ─────────────────────────────── */
+    /* status */
     #statusBox {
-      display: none;
-      margin-top: 16px;
-      padding: 13px 15px;
-      border-radius: var(--r-sm);
-      font-size: 0.86rem;
-      font-weight: 600;
-      line-height: 1.5;
-      animation: fadeSlide 0.3s ease both;
+      display: none; margin-top: 14px; padding: 13px 15px;
+      border-radius: var(--r-sm); font-size: 0.9rem; font-weight: 600; line-height: 1.5;
+      border: 1.5px solid transparent;
     }
-    @keyframes fadeSlide {
-      from { opacity: 0; transform: translateY(-6px); }
-      to   { opacity: 1; transform: translateY(0); }
-    }
-    .st-success { background: var(--green-pale); color: #15803D; border: 1.5px solid #BBF7D0; }
-    .st-error   { background: var(--red-pale);   color: #B91C1C; border: 1.5px solid #FECACA; }
-    .st-info    { background: var(--blue-pale);  color: #1D4ED8; border: 1.5px solid var(--blue-mid); }
+    #statusBox.show { display: block; animation: pop 0.3s var(--ease) both; }
+    @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    .st-error   { background: var(--red-tint);   color: #B4262B; border-color: #F7C6C8 !important; }
+    .st-success { background: var(--green-tint); color: #0B7A3B; border-color: #BDE7CC !important; }
+    .st-info    { background: var(--blue-tint); color: var(--blue-deep); border-color: var(--blue-mid) !important; }
 
-    /* ── Secondary action row ───────────────── */
-    .action-row { display: none; margin-top: 14px; gap: 10px; width: 100%; }
-    .action-row.visible { display: flex; }
+    .row { display: none; gap: 10px; margin-top: 12px; }
+    .row.visible { display: flex; }
 
-    .sec-btn {
-      flex: 1;
-      padding: 13px 10px;
-      background: transparent;
-      border: 1.5px solid var(--line);
-      border-radius: var(--r-lg);
-      font-size: 0.82rem;
-      font-weight: 700;
-      cursor: pointer;
+    .ghost {
+      flex: 1; height: 48px; padding: 0 14px;
+      background: #fff; border: 1.5px solid var(--line-strong); border-radius: var(--r-md);
+      font-weight: 700; font-size: 0.9rem; color: var(--ink-2);
       transition: border-color 0.2s, background 0.2s, color 0.2s;
       white-space: nowrap;
     }
-    .sec-btn.retry { color: var(--blue); }
-    .sec-btn.retry:hover { background: var(--blue-pale); border-color: var(--blue-mid); }
-    .sec-btn.change { color: var(--muted); }
-    .sec-btn.change:hover { background: #F7FAFF; border-color: #c8d4e8; color: var(--text); }
+    .ghost:hover { border-color: var(--blue); color: var(--blue-deep); background: var(--blue-tint); }
 
-    /* ── QR ─────────────────────────────────── */
-    .qr-frame {
-      background: #fff;
-      border: 1.5px solid var(--line);
-      border-radius: var(--r-lg);
-      padding: 18px;
-      box-shadow:
-        0 2px 8px rgba(13,21,38,0.06),
-        0 8px 24px rgba(13,21,38,0.05);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
+    /* how-to (a real sequence) */
+    .how { list-style: none; margin-top: clamp(28px, 5vw, 40px); padding-top: 26px; border-top: 1px solid var(--line); display: grid; gap: 16px; counter-reset: s; }
+    .how li { display: grid; grid-template-columns: 28px 1fr; gap: 14px; align-items: start; font-size: 0.93rem; line-height: 1.5; color: var(--ink-2); counter-increment: s; position: relative; }
+    .how li::before {
+      content: counter(s);
+      width: 28px; height: 28px; border-radius: 50%;
+      background: var(--blue-tint); color: var(--blue-deep);
+      font-weight: 800; font-size: 0.8rem;
+      display: flex; align-items: center; justify-content: center;
     }
+    .how li:not(:last-child)::after { content: ''; position: absolute; left: 13.5px; top: 32px; bottom: -14px; width: 1px; background: var(--blue-mid); }
+    .how b { color: var(--ink); font-weight: 700; }
 
-    #qrImg {
-      width: 100%;
-      max-width: 232px;
-      height: auto;
-      aspect-ratio: 1;
-      border-radius: 8px;
-      display: block;
-      image-rendering: pixelated;
-    }
-
-    /* ── Pairing code (shown under the QR) ──── */
-    .pair-block {
-      display: none;
-      width: 100%;
-      background: var(--blue-pale);
-      border: 1.5px solid var(--blue-mid);
-      border-radius: var(--r-lg);
-      padding: 16px 18px;
-      text-align: center;
+    /* ── Right: stage ─────────────────────── */
+    .stage {
       position: relative;
+      background-color: var(--stage);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(255,255,255,0.85), transparent 70%),
+        radial-gradient(circle, rgba(86,144,240,0.16) 1px, transparent 1.4px);
+      background-size: auto, 20px 20px;
+      border-top: 1px solid var(--line);
+      padding: clamp(28px, 5vw, 48px) clamp(20px, 4vw, 40px);
+      display: flex; align-items: center; justify-content: center;
+      min-height: 340px;
     }
-    .pair-label {
-      font-size: 0.72rem;
-      font-weight: 700;
-      color: var(--blue-deep);
-      margin-bottom: 8px;
-    }
-    .pair-code-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-    }
-    .pair-code {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: clamp(1.4rem, 1.1rem + 1.4vw, 1.7rem);
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      color: var(--text);
-      font-variant-numeric: tabular-nums;
-    }
-    .copy-btn {
-      flex-shrink: 0;
-      width: 32px;
-      height: 32px;
-      border-radius: 10px;
-      border: 1.5px solid var(--blue-mid);
-      background: #fff;
-      color: var(--blue-deep);
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: background 0.18s, transform 0.12s;
-    }
-    .copy-btn:hover { background: var(--blue-pale); }
-    .copy-btn:active { transform: scale(0.93); }
-    .copy-btn svg { width: 15px; height: 15px; }
-    .pair-hint {
-      font-size: 0.74rem;
-      color: var(--muted);
-      margin-top: 8px;
-      font-weight: 500;
-    }
+    @media (min-width: 880px) { .stage { border-top: none; border-left: 1px solid var(--line); min-height: 640px; } }
+    @media (max-width: 879px) { .card[data-state="idle"] .stage { display: none; } }
 
-    /* ── Steps ──────────────────────────────── */
-    .steps { width: 100%; display: none; flex-direction: column; gap: 8px; }
-    .steps.visible { display: flex; }
+    .view { display: none; flex-direction: column; align-items: center; width: 100%; max-width: 340px; gap: 18px; text-align: center; }
+    .card[data-state="idle"]      .view-idle      { display: flex; }
+    .card[data-state="loading"]   .view-loading   { display: flex; }
+    .card[data-state="qr"]        .view-qr        { display: flex; animation: pop 0.45s var(--ease) both; }
+    .card[data-state="connected"] .view-connected { display: flex; animation: pop 0.45s var(--ease) both; }
 
-    .steps-title {
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--muted);
-      margin-bottom: 2px;
-    }
+    .view h2 { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.3rem; font-weight: 700; letter-spacing: -0.015em; }
+    .view p  { font-size: 0.93rem; line-height: 1.55; color: var(--ink-2); }
 
-    .step {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      background: #F8FAFD;
+    /* idle: phone illustration */
+    .phone-art { width: min(210px, 56vw); height: auto; filter: drop-shadow(0 24px 30px rgba(40,75,150,0.15)); }
+    .scan-line { animation: scan 2.6s ease-in-out infinite; }
+    @keyframes scan { 0%, 100% { transform: translateY(0); opacity: 0.2; } 12%, 88% { opacity: 1; } 50% { transform: translateY(104px); } }
+
+    /* loading skeleton */
+    .skeleton {
+      width: 248px; height: 248px; border-radius: var(--r-lg);
+      background: linear-gradient(100deg, #fff 30%, #EBF3FF 50%, #fff 70%);
+      background-size: 220% 100%;
+      animation: shimmer 1.3s linear infinite;
       border: 1px solid var(--line);
-      border-radius: var(--r-md);
-      padding: 11px 14px;
-      transition: border-color 0.2s, background 0.2s;
+      box-shadow: 0 16px 40px rgba(40,75,150,0.10);
     }
-    .step:hover { background: #fff; border-color: var(--blue-mid); }
+    @keyframes shimmer { from { background-position: 120% 0; } to { background-position: -120% 0; } }
 
-    .step-num {
-      width: 25px;
-      height: 25px;
-      border-radius: 8px;
-      background: linear-gradient(135deg, var(--blue-deep), var(--blue));
-      color: #fff;
-      font-size: 0.7rem;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-shrink: 0;
-      box-shadow: 0 2px 6px rgba(79,128,237,0.3);
+    /* qr view */
+    .tabs { display: none; padding: 4px; gap: 4px; background: rgba(255,255,255,0.8); border: 1px solid var(--line); border-radius: 100px; }
+    .tabs.visible { display: inline-flex; }
+    .tab { border: none; background: transparent; padding: 8px 18px; border-radius: 100px; font-weight: 700; font-size: 0.85rem; color: var(--ink-2); transition: background 0.2s, color 0.2s; }
+    .tab[aria-selected="true"] { background: var(--blue); color: #fff; box-shadow: 0 4px 12px rgba(86,144,240,0.3); }
+    .tab:not([aria-selected="true"]):hover { color: var(--blue-deep); }
+
+    .code-box { position: relative; width: 100%; display: flex; flex-direction: column; align-items: center; gap: 14px; }
+
+    .qr-wrap { position: relative; width: min(272px, 100%); aspect-ratio: 1; color: var(--blue); transition: color 0.4s; }
+    .qr-wrap.warn { color: var(--amber); }
+    .qr-wrap.crit { color: var(--red); }
+    .qr-wrap svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .ring-track { fill: none; stroke: rgba(21,23,46,0.08); stroke-width: 2.2; }
+    .ring { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-dasharray: 100 100; stroke-dashoffset: 0; transition: stroke-dashoffset 0.3s linear; }
+    .qr-inner {
+      position: absolute; inset: 5.5%;
+      background: #fff; border-radius: 16px; padding: 12px;
+      box-shadow: 0 10px 30px rgba(40,75,150,0.12);
+      display: flex; align-items: center; justify-content: center;
     }
+    #qrImg { width: 100%; height: 100%; object-fit: contain; image-rendering: pixelated; border-radius: 6px; display: block; }
 
-    .step-text { font-size: 0.83rem; color: var(--text); font-weight: 500; line-height: 1.45; }
-    .step-text b { font-weight: 700; color: var(--text); }
+    .pair-panel { display: none; width: 100%; flex-direction: column; align-items: center; gap: 8px; padding: 16px 18px; background: #fff; border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: 0 10px 30px rgba(40,75,150,0.08); }
+    .pair-label { font-size: 0.82rem; font-weight: 700; color: var(--ink-2); }
+    .pair-row { display: flex; align-items: center; gap: 12px; }
+    .pair-code { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2rem); letter-spacing: 0.1em; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .copy-btn { width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; border: 1.5px solid var(--blue-mid); background: var(--blue-tint); color: var(--blue-deep); display: flex; align-items: center; justify-content: center; transition: background 0.2s, transform 0.12s; }
+    .copy-btn:hover { background: var(--blue-mid); }
+    .copy-btn:active { transform: scale(0.94); }
+    .copy-btn svg { width: 18px; height: 18px; }
+    .pair-hint { font-size: 0.82rem; color: var(--ink-3); }
 
-    /* ── Progress bar ───────────────────────── */
-    .progress-wrap { width: 100%; display: none; }
-    .progress-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-    .progress-lbl { font-size: 0.75rem; font-weight: 600; color: var(--muted); }
-    .progress-track { height: 5px; background: var(--line); border-radius: 100px; overflow: hidden; }
-    .progress-fill {
-      height: 100%;
-      border-radius: 100px;
-      background: linear-gradient(90deg, var(--blue-deep), var(--blue), #8eb8ff);
-      width: 100%;
+
+    .expired {
+      position: absolute; inset: 0; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      background: rgba(255,255,255,0.88); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+      border-radius: var(--r-lg); text-align: center; padding: 20px; z-index: 2;
     }
+    .code-box.is-expired .expired { display: flex; animation: pop 0.3s var(--ease) both; }
+    .expired strong { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.1rem; }
+    .expired .btn { margin-top: 0; width: auto; height: 46px; padding: 0 22px; font-size: 0.93rem; }
 
-    #qrActionRow { display: none; margin-top: 2px; gap: 10px; width: 100%; }
-    #qrActionRow.visible { display: flex; }
+    .timer { font-size: 0.9rem; font-weight: 600; color: var(--ink-2); font-variant-numeric: tabular-nums; }
+    .timer b { color: var(--ink); font-weight: 800; }
 
-    /* ── Small phones ───────────────────────── */
-    @media (max-width: 480px) {
-      body { padding: 0; background: #fff; align-items: flex-start; justify-content: center; }
-      .card, .card.expanded {
-        border-radius: 0;
-        box-shadow: none;
-        border: none;
-        min-height: 100svh;
-        max-width: 100%;
-        animation: none;
-      }
-      .card::after { height: 80px; }
-      .header { margin-bottom: 28px; }
-      #qrImg { max-width: 208px; }
-      .country-chip { padding: 0 12px; }
-    }
+    .stage-actions { display: flex; gap: 10px; width: 100%; }
+    .stage-actions .ghost { height: 44px; font-size: 0.86rem; }
 
-    @media (max-width: 340px) {
-      .country-chip .code { display: none; }
+    /* connected */
+    .ok-badge { width: 92px; height: 92px; border-radius: 50%; background: var(--green-tint); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 10px rgba(18,161,80,0.08); }
+    .ok-badge svg { width: 44px; height: 44px; color: var(--green); }
+    .ok-badge path { stroke-dasharray: 30; stroke-dashoffset: 30; animation: draw 0.6s 0.15s var(--ease) forwards; }
+    @keyframes draw { to { stroke-dashoffset: 0; } }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .chip { padding: 8px 14px; background: #fff; border: 1px solid var(--line); border-radius: 100px; font-weight: 700; font-size: 0.88rem; color: var(--ink); }
+    .chip:empty { display: none; }
+
+    /* mobile edge-to-edge */
+    @media (max-width: 520px) {
+      body { padding: 0; align-items: flex-start; background-image: radial-gradient(ellipse 80% 40% at 0% 0%, rgba(86,144,240,0.12), transparent 70%); }
+      .card { border-radius: 0; border: none; box-shadow: none; min-height: 100svh; }
+      .brand { margin-bottom: 26px; }
     }
   </style>
 </head>
 <body>
 
-<div class="card" id="mainCard">
- <div class="layout">
+<main class="card" id="mainCard" data-state="idle">
 
-  <!-- ── FORM ── -->
-  <div class="col-left">
-
-    <div class="header">
-      <div class="icon-badge">
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07
-                   A19.5 19.5 0 0 1 4.13 12a19.79 19.79 0 0 1-3.07-8.67
-                   A2 2 0 0 1 3.08 1.08h3a2 2 0 0 1 2 1.72
-                   c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L7.09 8.91
-                   a16 16 0 0 0 6 6l2.27-2.27a2 2 0 0 1 2.11-.45
-                   c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/>
-        </svg>
-      </div>
-      <h1 class="title">Conectar WhatsApp</h1>
-      <p class="subtitle">Vincule sua conta ao Galaxy Chat<br>de forma rápida e segura.</p>
+  <!-- ── Formulário ── -->
+  <section class="form-pane">
+    <div class="brand">
+      <img src="login.png" alt="Galaxy Chat" class="brand-logo">
     </div>
 
-    <div class="field">
+    <h1>Conecte seu WhatsApp</h1>
+    <p class="lead">Vincule sua conta ao Galaxy Chat de forma rápida e segura. Leva menos de um minuto.</p>
+
+    <form id="connectForm" novalidate>
       <label for="phone">Número do WhatsApp</label>
-      <div class="phone-row">
-        <div class="country-chip">
-          <span class="flag"><img src="https://flagcdn.com/w40/br.png" alt="Brasil"></span>
-          <span class="code">+55</span>
+      <div class="phone-field" id="phoneField">
+        <div class="country">
+          <img src="https://flagcdn.com/w40/br.png" alt="Brasil">
+          <span>+55</span>
         </div>
-        <input type="text" id="phone" placeholder="(18) 99999-9999" maxlength="15" inputmode="numeric">
+        <input type="text" id="phone" placeholder="(18) 99999-9999" maxlength="15" inputmode="numeric" autocomplete="tel-national" aria-describedby="statusBox">
       </div>
-    </div>
 
-    <button class="btn" id="mainBtn" onclick="handleStart()">
-      <div class="spin" id="loader"></div>
-      <span id="btnLabel">Gerar QR Code</span>
-    </button>
+      <button class="btn" id="mainBtn" type="submit">
+        <span class="spin" id="loader" aria-hidden="true"></span>
+        <span id="btnLabel">Gerar QR Code</span>
+      </button>
+    </form>
 
     <div id="statusBox" role="status" aria-live="polite"></div>
 
-    <div class="action-row" id="errorActionRow">
-      <button class="sec-btn retry" onclick="handleStart()">↺ Tentar novamente</button>
-      <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
+    <div class="row" id="errorActionRow">
+      <button class="ghost" type="button" onclick="handleStart()">Tentar novamente</button>
+      <button class="ghost" type="button" onclick="handleChange()">Mudar número</button>
     </div>
 
-  </div><!-- /col-left -->
+    <ol class="how" aria-label="Como conectar">
+      <li><span>Abra o <b>WhatsApp</b> no seu celular</span></li>
+      <li><span>Abra o menu <b>⋮</b> e toque em <b>Dispositivos conectados</b></span></li>
+      <li><span id="stepThree">Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code</span></li>
+    </ol>
+  </section>
 
-  <div class="col-divider"></div>
+  <!-- ── Palco ── -->
+  <section class="stage" aria-live="polite">
 
-  <!-- ── QR + PAREAMENTO (mesma visualização) ── -->
-  <div class="col-right" id="colRight">
-
-    <div class="qr-frame" id="qrFrame">
-      <img id="qrImg" alt="QR Code WhatsApp">
+    <!-- Ocioso -->
+    <div class="view view-idle">
+      <svg class="phone-art" viewBox="0 0 220 400" fill="none" aria-hidden="true">
+        <rect x="14" y="8" width="192" height="384" rx="38" fill="#fff" stroke="#D3D6E8" stroke-width="2"/>
+        <rect x="26" y="20" width="168" height="360" rx="28" fill="#F7F8FD"/>
+        <rect x="88" y="30" width="44" height="12" rx="6" fill="#E5E7F2"/>
+        <rect x="44" y="70" width="90" height="9" rx="4.5" fill="#D9DCEE"/>
+        <rect x="44" y="88" width="132" height="7" rx="3.5" fill="#E8EAF4"/>
+        <rect x="44" y="102" width="104" height="7" rx="3.5" fill="#E8EAF4"/>
+        <rect x="50" y="130" width="120" height="120" rx="14" fill="#fff" stroke="#E5E7F2"/>
+        <g id="miniQr" transform="translate(62 142)"></g>
+        <g stroke="#5690F0" stroke-width="4" stroke-linecap="round">
+          <path d="M44 154v-14a10 10 0 0 1 10-10h14"/>
+          <path d="M176 154v-14a10 10 0 0 0-10-10h-14"/>
+          <path d="M44 226v14a10 10 0 0 0 10 10h14"/>
+          <path d="M176 226v14a10 10 0 0 1-10 10h-14"/>
+        </g>
+        <g class="scan-line">
+          <rect x="52" y="138" width="116" height="3" rx="1.5" fill="#5690F0"/>
+          <rect x="52" y="124" width="116" height="14" fill="url(#scanGlow)"/>
+        </g>
+        <defs>
+          <linearGradient id="scanGlow" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0" stop-color="#5690F0" stop-opacity="0"/>
+            <stop offset="1" stop-color="#5690F0" stop-opacity="0.22"/>
+          </linearGradient>
+        </defs>
+        <rect x="44" y="290" width="132" height="40" rx="12" fill="#5690F0" opacity=".12"/>
+        <rect x="70" y="306" width="80" height="8" rx="4" fill="#5690F0" opacity=".5"/>
+      </svg>
+      <div>
+        <h2>Seu QR Code aparece aqui</h2>
+        <p>Digite o número do WhatsApp e toque em Gerar QR Code.</p>
+      </div>
     </div>
 
-    <div class="pair-block" id="pairBlock">
-      <div class="pair-label">Código de pareamento</div>
-      <div class="pair-code-row">
-        <div class="pair-code" id="pairCode">— — — —</div>
-        <button class="copy-btn" id="copyBtn" onclick="copyPairCode()" aria-label="Copiar código" title="Copiar código">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="9" y="9" width="12" height="12" rx="2.5"/>
-            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+    <!-- Carregando -->
+    <div class="view view-loading">
+      <div class="skeleton" aria-hidden="true"></div>
+      <div>
+        <h2>Gerando seu QR Code</h2>
+        <p>Isso pode levar alguns segundos.</p>
+      </div>
+    </div>
+
+    <!-- QR / pareamento -->
+    <div class="view view-qr">
+      <div class="code-box" id="codeBox">
+        <div class="qr-wrap" id="qrFrame">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <rect class="ring-track" x="1.2" y="1.2" width="97.6" height="97.6" rx="12" pathLength="100"/>
+            <rect class="ring" id="ring" x="1.2" y="1.2" width="97.6" height="97.6" rx="12" pathLength="100"/>
           </svg>
-        </button>
+          <div class="qr-inner"><img id="qrImg" alt="QR Code para conectar o WhatsApp"></div>
+        </div>
+
+        <div class="pair-panel" id="pairBlock">
+          <div class="pair-label">Código de pareamento</div>
+          <div class="pair-row">
+            <div class="pair-code" id="pairCode">— — — —</div>
+            <button class="copy-btn" id="copyBtn" type="button" onclick="copyPairCode()" aria-label="Copiar código" title="Copiar código">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="12" height="12" rx="2.5"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+              </svg>
+            </button>
+          </div>
+          <div class="pair-hint">No WhatsApp, toque em “Usar número de telefone” e digite o código.</div>
+        </div>
+
+        <div class="expired" id="expired">
+          <strong>O código expirou</strong>
+          <button class="btn" type="button" onclick="handleRetry()">Gerar novo QR Code</button>
+        </div>
       </div>
-      <div class="pair-hint">Digite este código no WhatsApp</div>
+
+      <div class="timer" id="timerText">Expira em <b id="countdownLabel">30s</b></div>
+
+      <div class="stage-actions">
+        <button class="ghost" type="button" onclick="handleRetry()">Novo QR Code</button>
+        <button class="ghost" type="button" onclick="handleChange()">Mudar número</button>
+      </div>
     </div>
 
-    <div class="steps" id="stepsCombined">
-      <div class="steps-title">Como conectar</div>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div class="step-text">Abra o <b>WhatsApp</b> no seu celular</div>
+    <!-- Conectado -->
+    <div class="view view-connected">
+      <div class="ok-badge">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
       </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div class="step-text">Acesse <b>⋮ Menu → Dispositivos conectados</b></div>
+      <div>
+        <h2>WhatsApp conectado</h2>
+        <p>Sua conta já está vinculada ao Galaxy Chat.</p>
       </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div class="step-text" id="stepThree">Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima</div>
+      <div class="chips">
+        <span class="chip" id="connName"></span>
+        <span class="chip" id="connPhone"></span>
       </div>
+      <button class="ghost" type="button" style="flex:none;width:100%" onclick="handleChange()">Conectar outro número</button>
     </div>
 
-    <div class="progress-wrap" id="progressWrap">
-      <div class="progress-row">
-        <span class="progress-lbl">QR Code expira em</span>
-        <span class="progress-lbl" id="countdownLabel">30s</span>
-      </div>
-      <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
-    </div>
-
-    <div class="action-row" id="qrActionRow">
-      <button class="sec-btn retry" onclick="handleRetry()">↺ Novo QR Code</button>
-      <button class="sec-btn change" onclick="handleChange()">✎ Mudar número</button>
-    </div>
-
-  </div><!-- /col-right -->
-
- </div><!-- /layout -->
-</div>
+  </section>
+</main>
 
 <script>
   const WEBHOOK = "https://apiworkflow.galaxychat.com.br/webhook/painel-de-conexao";
   const TIMEOUT = 30;
 
-  let timer = null;
   let countdown = null;
-
   const $ = id => document.getElementById(id);
+
+  /* mini QR decorativo da ilustração */
+  (function () {
+    const g = $('miniQr'), n = 9, s = 96 / n;
+    let seed = 7;
+    const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+    const inFinder = (x, y) => (x < 3 && y < 3) || (x > 5 && y < 3) || (x < 3 && y > 5);
+    for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) {
+      if (inFinder(x, y) || rnd() > 0.52) {
+        const r = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+        r.setAttribute('x', x * s); r.setAttribute('y', y * s);
+        r.setAttribute('width', s - 1.5); r.setAttribute('height', s - 1.5);
+        r.setAttribute('rx', 1.5); r.setAttribute('fill', '#15172E');
+        g.appendChild(r);
+      }
+    }
+  })();
+
+  function setState(state) { $('mainCard').dataset.state = state; }
 
   function setStatus(msg, type) {
     const box = $('statusBox');
     box.textContent = msg;
-    box.className = `st-${type}`;
-    box.style.display = 'block';
-    $('errorActionRow').className = type === 'error' ? 'action-row visible' : 'action-row';
+    box.className = `show st-${type}`;
+    $('errorActionRow').className = type === 'error' ? 'row visible' : 'row';
+    $('phoneField').classList.toggle('invalid', type === 'error' && msg.startsWith('Número inválido'));
   }
 
   function clearStatus() {
-    $('statusBox').style.display = 'none';
-    $('errorActionRow').className = 'action-row';
+    $('statusBox').className = '';
+    $('errorActionRow').className = 'row';
+    $('phoneField').classList.remove('invalid');
   }
 
   function setLoading(on) {
     $('loader').style.display = on ? 'block' : 'none';
-    $('btnLabel').textContent = on ? 'Processando...' : 'Gerar QR Code';
+    $('btnLabel').textContent = on ? 'Gerando…' : 'Gerar QR Code';
     $('mainBtn').disabled = on;
   }
 
+  /* ── Contagem regressiva (baseada em horário, não em ticks) ── */
   function startCountdown() {
-    const wrap = $('progressWrap');
-    const fill = $('progressFill');
-    const lbl  = $('countdownLabel');
-    wrap.style.display = 'block';
-    wrap.dataset.active = '1';
+    stopCountdown();
+    const total = TIMEOUT * 1000;
+    const endAt = Date.now() + total;
+    const ring = $('ring'), wrap = $('qrFrame'), lbl = $('countdownLabel');
 
-    fill.style.transition = 'none';
-    fill.style.width = '100%';
+    wrap.classList.remove('warn', 'crit');
+    $('codeBox').classList.remove('is-expired');
+    $('timerText').style.visibility = 'visible';
+    ring.style.strokeDashoffset = 0;
 
-    let remaining = TIMEOUT;
-    lbl.textContent = remaining + 's';
-
-    requestAnimationFrame(() => {
-      fill.style.transition = `width ${TIMEOUT}s linear`;
-      fill.style.width = '0%';
-    });
-
-    countdown = setInterval(() => {
-      remaining--;
-      lbl.textContent = remaining > 0 ? remaining + 's' : '0s';
-      if (remaining <= 0) clearInterval(countdown);
-    }, 1000);
-
-    timer = setTimeout(() => {
-      $('qrActionRow').className = 'action-row visible';
-    }, TIMEOUT * 1000);
+    const tick = () => {
+      const left = Math.max(0, endAt - Date.now());
+      const secs = Math.ceil(left / 1000);
+      lbl.textContent = secs + 's';
+      ring.style.strokeDashoffset = (100 * (1 - left / total)).toFixed(2);
+      wrap.classList.toggle('crit', secs <= 5);
+      wrap.classList.toggle('warn', secs <= 10 && secs > 5);
+      if (left <= 0) {
+        stopCountdown();
+        $('codeBox').classList.add('is-expired');
+        $('timerText').style.visibility = 'hidden';
+      }
+    };
+    tick();
+    countdown = setInterval(tick, 250);
   }
 
-  function resetCountdown() {
-    clearTimeout(timer);
+  function stopCountdown() {
     clearInterval(countdown);
-    $('progressWrap').style.display = 'none';
-    $('progressWrap').dataset.active = '';
-    $('qrActionRow').className = 'action-row';
+    countdown = null;
   }
 
   function handleChange() {
-    resetCountdown();
+    stopCountdown();
     clearStatus();
-    $('mainCard').classList.remove('expanded');
+    setState('idle');
+    setLoading(false);
     $('phone').value = '';
     $('phone').focus();
-    setLoading(false);
   }
 
   function formatPairCode(code) {
@@ -696,14 +547,28 @@
     return code;
   }
 
+  function normalizeQr(src) {
+    const s = String(src).trim();
+    if (/^(data:|https?:)/i.test(s)) return s;
+    if (s.length > 200 && /^[A-Za-z0-9+/=\s]+$/.test(s)) return 'data:image/png;base64,' + s.replace(/\s/g, '');
+    return s;
+  }
+
   function copyPairCode() {
     const text = $('pairCode').textContent.replace(/\s/g, '');
     navigator.clipboard?.writeText(text).then(() => {
       const btn = $('copyBtn');
       const original = btn.innerHTML;
-      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
       setTimeout(() => { btn.innerHTML = original; }, 1400);
     });
+  }
+
+  function formatPhone(n) {
+    const d = String(n).replace(/\D/g, '').replace(/^55/, '');
+    if (d.length === 11) return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+    if (d.length === 10) return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
+    return n;
   }
 
   async function handleStart() {
@@ -711,17 +576,18 @@
     const phone = '55' + raw;
 
     if (raw.length < 10 || raw.length > 11) {
-      setStatus('Número inválido. Digite DDD + número (ex: 18 99999-9999)', 'error');
+      setStatus('Número inválido. Digite o DDD e o número, por exemplo 18 99999-9999.', 'error');
+      $('phone').focus();
       return;
     }
 
     clearStatus();
-    $('mainCard').classList.remove('expanded');
-    resetCountdown();
+    stopCountdown();
     setLoading(true);
+    setState('loading');
 
     try {
-      const res  = await fetch(WEBHOOK, {
+      const res = await fetch(WEBHOOK, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ numero: phone, tentativa: 1 })
@@ -732,67 +598,72 @@
       const data = Array.isArray(raw2) ? raw2[0] : raw2;
       setLoading(false);
 
-      if (data.conexao === 'inexistente') { setStatus('Instância não encontrada.', 'error'); return; }
-      if (data.connected) { setStatus('✓ Sua conta já está conectada!', 'success'); return; }
+      // o n8n responde "conexão" (com til); aceita as duas grafias
+      if ((data['conexão'] || data.conexao) === 'inexistente') {
+        setState('idle');
+        setStatus('Não encontramos uma instância para esse número. Confira o número e tente de novo.', 'error');
+        return;
+      }
+
+      if (data.connected) {
+        $('connName').textContent  = data.nome || '';
+        $('connPhone').textContent = data.telefone ? formatPhone(data.telefone) : '';
+        setState('connected');
+        return;
+      }
+
       if (data.erro || data.limiteAtingido) {
-        setStatus(data.message || 'Tempo limite ao gerar o QR Code. Tente novamente.', 'error');
+        setState('idle');
+        setStatus(data.message || 'O QR Code demorou demais para ser gerado. Tente novamente.', 'error');
         return;
       }
 
-      const qrSrc = data.qrcodeText || data.qrcodePng || data.qrcode;
-      const pair = data.pairingCode || data.pairing_code || data.code;
+      const qrRaw = data.qrcodeText || data.qrcodePng || data.qrcode;
+      const pair  = data.pairingCode || data.pairing_code || data.code;
 
-      if (!qrSrc && !pair) {
-        setStatus(data.message || 'QR Code não disponível no momento. Tente novamente em instantes.', 'error');
+      if (!qrRaw && !pair) {
+        setState('idle');
+        setStatus(data.message || 'O QR Code ainda não está disponível. Tente novamente em instantes.', 'error');
         return;
       }
-
-      $('mainCard').classList.add('expanded');
 
       // QR
-      if (qrSrc) {
-        $('qrImg').src = qrSrc;
-        $('qrFrame').style.display = 'flex';
-      } else {
-        $('qrFrame').style.display = 'none';
-      }
+      $('qrFrame').style.display = qrRaw ? '' : 'none';
+      if (qrRaw) $('qrImg').src = normalizeQr(qrRaw);
 
-      // Pareamento — exibido logo abaixo do QR, na mesma tela
-      if (pair) {
-        $('pairCode').textContent = formatPairCode(pair);
-        $('pairBlock').style.display = 'block';
-      } else {
-        $('pairBlock').style.display = 'none';
-      }
+      // Pareamento: aparece logo abaixo do QR
+      if (pair) $('pairCode').textContent = formatPairCode(pair);
+      $('pairBlock').style.display = pair ? 'flex' : 'none';
 
-      // Texto do passo 3 se adapta ao que está disponível
+      // Passo 3 se adapta ao que está disponível
       const stepThree = $('stepThree');
-      if (qrSrc && pair) {
-        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima — ou toque em <b>"Usar número de telefone"</b> e digite o código abaixo';
-      } else if (qrSrc) {
-        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code acima';
+      if (qrRaw && pair) {
+        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e escaneie o QR Code, ou escolha <b>Usar número de telefone</b> e digite o código';
       } else if (pair) {
-        stepThree.innerHTML = 'Toque em <b>"Usar número de telefone"</b> e digite o código acima';
+        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b>, escolha <b>Usar número de telefone</b> e digite o código';
+      } else {
+        stepThree.innerHTML = 'Toque em <b>Conectar dispositivo</b> e aponte a câmera para o QR Code';
       }
-      $('stepsCombined').classList.add('visible');
 
+      setState('qr');
       startCountdown();
+      if (window.matchMedia('(max-width: 879px)').matches) {
+        document.querySelector('.stage').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
 
     } catch {
       setLoading(false);
-      setStatus('Erro ao conectar. Verifique o servidor n8n.', 'error');
+      setState('idle');
+      setStatus('Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.', 'error');
     }
   }
 
-  function handleRetry() {
-    resetCountdown();
-    $('mainCard').classList.remove('expanded');
-    handleStart();
-  }
+  function handleRetry() { handleStart(); }
 
-  $('phone').addEventListener('keydown', e => { if (e.key === 'Enter') handleStart(); });
+  $('connectForm').addEventListener('submit', e => { e.preventDefault(); handleStart(); });
 
   $('phone').addEventListener('input', e => {
+    $('phoneField').classList.remove('invalid');
     let v = e.target.value.replace(/\D/g, '');
     if (v.startsWith('55') && v.length > 11) v = v.slice(2);
     v = v.slice(0, 11);
